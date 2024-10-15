@@ -88,7 +88,7 @@ export class CustomersService {
     async getMyCustomer(id: number){
         const getMyCustomers = await this.customersRepository.find({
             where: { user: { id } }, // Filtra por el id del usuario relacionado,
-            relations: ['opportunities', 'interactions','reminders']
+            relations: ['opportunities', 'interactions','purchases','reminders']
      
         });
         return { customers: getMyCustomers };
