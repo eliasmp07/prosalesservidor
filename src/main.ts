@@ -10,7 +10,7 @@ async function bootstrap() {
   app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
   // Use environment variable for the host, defaulting to 'localhost'
   const host = process.env.HOST || 'localhost';
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3002;
 
   await app.listen(port, host);
 }

@@ -4,78 +4,80 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import storage =  require('../utils/cloud_storage.js');
+import storage = require('../utils/cloud_storage.js');
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>,
+  ) {}
 
-    constructor(
-        @InjectRepository(User) private usersRepository: Repository<User>
-    ){ }
+  create(user: CreateUserDto) {
+    const newUser = this.usersRepository.create(user);
+    return this.usersRepository.save(newUser);
+  }
 
-    create(user: CreateUserDto) {
-        const newUser = this.usersRepository.create(user);
-        return this.usersRepository.save(newUser);
-    }
+  async findAll() {
+    const user = await this.usersRepository.find();
+    const users = await this.usersRepository.find();
 
-    async findAll(){
-        const user = await this.usersRepository.find()
-        const users = await this.usersRepository.find();
-
-        const data = users.map(user => ({
-            lastname: user.lastname,
-            name: user.name,
-            phone: user.phone,
-            image: user.image,
-            isAdmin: user.isAdmin
-        }));
+    const data = users.map((user) => ({
+      lastname: user.lastname,
+      name: user.name,
+      phone: user.phone,
+      image: user.image,
+      isAdmin: user.isAdmin,
+    }));
 
     return {
-        users: data
+      users: data,
     };
+  }
+
+  async update(id: number, user: UpdateUserDto) {
+    console.log('ID recibido:', id);
+    console.log('Datos del usuario recibidos:', user);
+    const userFound = await this.usersRepository.findOneBy({ id: id });
+    if (!userFound) {
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
     }
 
-    async update(id: number, user: UpdateUserDto){
-        
-  console.log('ID recibido:', id);
-  console.log('Datos del usuario recibidos:', user);
-        const userFound =  await this.usersRepository.findOneBy({id: id})
-        if (!userFound) {
-            throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
-        }
+    const updatedUser = Object.assign(userFound, user);
+    return this.usersRepository.save(updatedUser);
+  }
 
-        const updatedUser = Object.assign(userFound, user);
-        return this.usersRepository.save(updatedUser);
+  async updateWithImage(id: number, user: UpdateUserDto) {
+    const userFound = await this.usersRepository.findOneBy({ id: id });
+
+    if (!userFound) {
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
     }
 
-    async updateWithImage(id: number, user: UpdateUserDto){
-        
-        const userFound =  await this.usersRepository.findOneBy({id: id})
+    // Solo intentamos procesar la imagen si está presente
+    if (user.image != '') {
+      const buffer = Buffer.from(user.image, 'base64'); // Asegúrate de que image sea una cadena Base64 válida
+      const pathImage = `profilePhoto_${Date.now()}`;
+      const imageUrl = await storage(buffer, pathImage);
 
-        if (!userFound) {
-            throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
-        }
+      if (imageUrl) {
+        user.image = imageUrl; // Actualiza la URL de la imagen en el objeto user
+      }
+    }
+    const updatedUser = Object.assign(userFound, user);
+    console.log('User before saving:', updatedUser);
 
-        // Solo intentamos procesar la imagen si está presente
-         if (user.image != "") {
-        const buffer = Buffer.from(user.image, 'base64'); // Asegúrate de que image sea una cadena Base64 válida
-        const pathImage = `profilePhoto_${Date.now()}`;
-        const imageUrl = await storage(buffer, pathImage);
+    await this.usersRepository.save(updatedUser);
 
-        if (imageUrl) {
-            user.image = imageUrl; // Actualiza la URL de la imagen en el objeto user
-        }
-        }
-        const updatedUser = Object.assign(userFound, user);
-         await this.usersRepository.save(updatedUser);
-        const newUser = await this.usersRepository.findOneBy({ id });
+    console.log('User saved successfully');
+
+    const newUser = await this.usersRepository.findOneBy({ id });
 
     const data = {
-        lastname: newUser.lastname,
-        name: newUser.name,
-        phone: newUser.phone,
-        image: user.image,
+      lastname: newUser.lastname,
+      name: newUser.name,
+      phone: newUser.phone,
+      image: user.image,
     };
     return data;
-    }
+  }
 }
