@@ -1,14 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Reminder } from './entity/remider.entity';
 import { Repository } from 'typeorm';
+import { CreateOnlyReminderDto } from './dto/create-only-reminder.dto';
+import { Customer } from 'src/customers/entity/customer.entity';
 
 @Injectable()
 export class RemiderService {
 
     constructor(
         @InjectRepository(Reminder)
-        private reminderRepository: Repository<Reminder>
+        private reminderRepository: Repository<Reminder>,
+        @InjectRepository(Customer)
+        private customerRepository: Repository<Customer>
     ){}
 
     async getAllReminders(){
@@ -46,5 +50,21 @@ export class RemiderService {
         };
     }
     
+    async createReminder(createReminderDto: CreateOnlyReminderDto) {
+        const { customerId, ...reminderData } = createReminderDto;
+
+        // Corrige el método findOne para buscar el cliente por ID
+        const customer = await this.customerRepository.findOne({ where: { customer_id: customerId} });
+        if (!customer) {
+            throw new NotFoundException(`Customer with id ${customerId} not found`);
+        }
+
+        const reminder = this.reminderRepository.create({
+            ...reminderData,
+            customer,
+        });
+        
+        return this.reminderRepository.save(reminder);  // Guarda el recordatorio en la base de datos
+    }
     
 }
