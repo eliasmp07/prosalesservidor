@@ -1,6 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { InterationService } from './interation.service';
-import { CreateInteractionDto } from './dto/create-interation.dto';
 import { CreateOnlyInteractionDto } from './dto/create_only_interaction.dto';
 
 @Controller('interation')
