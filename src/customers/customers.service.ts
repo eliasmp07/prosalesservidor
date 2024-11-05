@@ -127,7 +127,7 @@ export class CustomersService {
   
       // Assign updated fields to `customer` and rename the result variable
       const updatedCustomer = Object.assign(customer, updateCustomerDto);
-      return this.customersRepository.save(updatedCustomer);
+      await this.customersRepository.save(updatedCustomer);
   }
   
 }

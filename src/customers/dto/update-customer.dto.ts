@@ -1,8 +1,8 @@
 export class UpdateCustomerDto{
-    readonly company_name: string;
-    readonly contact_name: string;
-    readonly email: string;
-    readonly type_of_client: string;
-    readonly phone_number: string;
-    readonly address?: string;
+    company_name: string;
+    contact_name: string;
+    email: string;
+    type_of_client: string;
+    phone_number: string;
+    address?: string;
 }
