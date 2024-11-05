@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Controller('customers')
 export class CustomersController {
@@ -14,6 +15,12 @@ export class CustomersController {
         this.customerService.create(customer)
     }
 
+    @Get('getCustomerById/:customerId')
+    getUserById( @Param('customerId') customerId: number) {
+        return this.customerService.getCustomerById(customerId);
+    }
+
+
     @Get('myCustomers/:id')
     findMyCustomers(@Param('id', ParseIntPipe) id: number){
         return this.customerService.getMyCustomer(id)
@@ -22,6 +29,11 @@ export class CustomersController {
     @Get("getAllCustomers")
     getAllCustomers(){
         return this.customerService.getAllCustomer()
+    }
+
+    @Post("updateCustomer/:customerId")
+    updateCustomer(@Param('customerId') id: number, @Body() updateCustomer: UpdateCustomerDto){
+         this.customerService.updateCustomer(id, updateCustomer)
     }
 
 }

@@ -8,6 +8,7 @@ import { Reminder } from 'src/remider/entity/remider.entity';
 import { Purchase } from 'src/purchase/entity/purchase.entity';
 import { Interaction } from 'src/interation/entity/interation.entity';
 import { Opportunity } from 'src/oportunity/entity/oportunity.entity';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomersService {
@@ -84,6 +85,17 @@ export class CustomersService {
         return customer;
       }
 
+      async getCustomerById(customerId: number) {
+        const customer = await this.customersRepository.findOne({
+            where: {
+                customer_id: customerId
+            }
+        });
+    
+        return customer; // Es buena práctica devolver o manejar el valor encontrado.
+    }
+    
+  
 
     async getMyCustomer(id: number){
         const getMyCustomers = await this.customersRepository.find({
@@ -100,4 +112,22 @@ export class CustomersService {
         })
         return {customers: customers}
     }
+
+    async updateCustomer(idCustomer: number, updateCustomerDto: UpdateCustomerDto) {
+      const customer = await this.customersRepository.findOneBy({
+          customer_id: idCustomer
+      });
+  
+      // Use `updateCustomerDto` directly to set fields
+      customer.address = updateCustomerDto.address;
+      customer.company_name = updateCustomerDto.company_name;
+      customer.contact_name = updateCustomerDto.contact_name;
+      customer.email = updateCustomerDto.email;
+      customer.type_of_client = updateCustomerDto.type_of_client;
+  
+      // Assign updated fields to `customer` and rename the result variable
+      const updatedCustomer = Object.assign(customer, updateCustomerDto);
+      return this.customersRepository.save(updatedCustomer);
+  }
+  
 }
