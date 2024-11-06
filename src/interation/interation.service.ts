@@ -4,12 +4,14 @@ import { Interaction } from './entity/interation.entity';
 import { Repository } from 'typeorm';
 import { Customer } from 'src/customers/entity/customer.entity';
 import { CreateOnlyInteractionDto } from './dto/create_only_interaction.dto';
+import { Purchase } from 'src/purchase/entity/purchase.entity';
 
 @Injectable()
 export class InterationService {
     constructor(
         @InjectRepository(Interaction) private interactionRepository: Repository<Interaction>,
         @InjectRepository(Customer) private customersRepository: Repository<Customer>,
+        @InjectRepository(Purchase) private purchaseRepository: Repository<Purchase>
     ){}
 
     async createInteraction(interaction: CreateOnlyInteractionDto) {
@@ -18,13 +20,31 @@ export class InterationService {
         });
     
         const interactions = this.interactionRepository.create({
-            interaction_id: interaction.interaction_id,
             interaction_type: interaction.interaction_type,
             interaction_date: interaction.interaction_date,
             notes: interaction.notes,
             customer: customer
         });
+
+        if (interaction.purchases) {
+            const purchaseEntities = interaction.purchases.map(purchaseDto => {
+              return this.purchaseRepository.create({
+                ...purchaseDto,
+                customer,
+              });
+            });
+            await this.purchaseRepository.save(purchaseEntities);
+          }
+      
     
-        return this.interactionRepository.save(interactions);
+    
+        const response = await this.interactionRepository.save(interaction)
+        const data = {
+            interaction_id: response.interaction_id,
+            interaction_type: response.interaction_type,
+            interaction_date: response.interaction_date,
+            notes: response.notes,
+        }
+        return data;
     }
 }
