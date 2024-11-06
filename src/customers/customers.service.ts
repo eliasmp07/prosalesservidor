@@ -87,6 +87,7 @@ export class CustomersService {
 
       async getCustomerById(customerId: number) {
         const customer = await this.customersRepository.findOne({
+          relations: ['opportunities', 'interactions','purchases','reminders'],
             where: {
                 customer_id: customerId
             }
