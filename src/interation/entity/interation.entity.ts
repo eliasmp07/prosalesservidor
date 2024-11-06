@@ -10,7 +10,7 @@ export class Interaction {
   @ManyToOne(() => Customer, customer => customer.interactions)
   customer: Customer;
 
-  @Column({ type: 'enum', enum: ['PRESENCIAL', 'LLAMADA', 'REUNIÓN REMOTA', 'EMAIL'] })
+  @Column()
   interaction_type: string;
 
   @Column({ type: 'bigint' })
