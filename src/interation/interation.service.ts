@@ -15,7 +15,7 @@ export class InterationService {
     ){}
 
     async createInteraction(interaction: CreateOnlyInteractionDto) {
-        const customer = await this.customersRepository.findOne({
+        const customerFound = await this.customersRepository.findOne({
             where: { customer_id: interaction.customerId }
         });
     
@@ -23,14 +23,14 @@ export class InterationService {
             interaction_type: interaction.interaction_type,
             interaction_date: interaction.interaction_date,
             notes: interaction.notes,
-            customer: customer
+            customer: customerFound
         });
 
         if (interaction.purchases) {
             const purchaseEntities = interaction.purchases.map(purchaseDto => {
               return this.purchaseRepository.create({
                 ...purchaseDto,
-                customer,
+                customer: customerFound,
               });
             });
             await this.purchaseRepository.save(purchaseEntities);
@@ -38,8 +38,8 @@ export class InterationService {
       
     
     
-        const response = await this.interactionRepository.save(interaction)
-        const data = {
+          const response = await this.interactionRepository.save(interactions);
+          const data = {
             interaction_id: response.interaction_id,
             interaction_type: response.interaction_type,
             interaction_date: response.interaction_date,
