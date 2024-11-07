@@ -8,6 +8,8 @@ import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { ConfigService } from '@nestjs/config';
+import { MailService } from './service/MailService';
+import { resetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
