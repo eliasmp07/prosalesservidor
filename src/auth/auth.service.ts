@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { RegisterUserDto } from './dto/register.user.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { compare } from 'bcrypt';
@@ -10,11 +10,13 @@ import * as argon2 from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from './service/MailService';
 import { resetPasswordDto } from './dto/reset-password.dto';
+import { Rol } from 'src/roles/rol.entity';
 
 @Injectable()
 export class AuthService {
 
     constructor(
+      @InjectRepository(Rol) private rolesRepository: Repository<Rol>,
         @InjectRepository(User) private usersRepository: Repository<User>,
         private jwtService: JwtService,
     private configService: ConfigService
@@ -37,7 +39,19 @@ export class AuthService {
             ...user,
             refreshToken: '' // O null, si has cambiado la columna a permitir NULL
         });
-    
+
+        let rolesIds = [];
+        
+        if (user.rolesIds !== undefined && user.rolesIds !== null) { // DATA
+            rolesIds = user.rolesIds;
+        }
+        else {
+            rolesIds.push('Ejecutivo de ventas')
+        }
+        
+        const roles = await this.rolesRepository.findBy({ id: In(rolesIds) });
+        newUser.roles = roles;
+
     await this.usersRepository.save(newUser); 
 
     // Generar tokens
@@ -50,7 +64,11 @@ export class AuthService {
 
     async login(loginRequest: LoginAuthDto){
         const {email, password} = loginRequest
-        const userFound = await this.usersRepository.findOneBy({email: email});
+        const userFound = await this.usersRepository.findOne({
+          where : { email: email },
+          relations: ['roles']
+
+        });
 
         if(!userFound){
           throw new HttpException('El email no existe', HttpStatus.NOT_FOUND);
@@ -62,6 +80,8 @@ export class AuthService {
           throw new  HttpException('La contraseña es incorrecta', HttpStatus.FORBIDDEN);
         }
 
+        const rolesIds = userFound.roles.map(rol => rol.id);
+
         const payload = {id: userFound.id, name: userFound.name};
         const token = this.jwtService.sign(payload)
       
@@ -72,6 +92,7 @@ export class AuthService {
         const data = {
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
+          roles: rolesIds,
           accessTokenExpirationTimestamp: accessTokenExpirationTimestamp,
           userId: payload.id,
           lastname: userFound.lastname,

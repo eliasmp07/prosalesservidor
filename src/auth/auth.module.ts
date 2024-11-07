@@ -8,11 +8,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
 import { AccessTokenStrategy } from './jwt.strategy';
 import { MailService } from './service/MailService';
+import { RolesService } from 'src/roles/roles.service';
+import { Rol } from 'src/roles/rol.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot(), // Ensure that this is correctly configured
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Rol]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -22,7 +24,7 @@ import { MailService } from './service/MailService';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, MailService],
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, MailService, RolesService],
   controllers: [AuthController],
 })
 export class AuthModule {}

@@ -10,6 +10,7 @@ import { OportunityModule } from './oportunity/oportunity.module';
 import { InterationModule } from './interation/interation.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { RemiderModule } from './remider/remider.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RemiderModule } from './remider/remider.module';
       synchronize: true,
     }),
     UsersModule,
+    RolesModule,
     AuthModule,
     PassportModule,
     CustomersModule,

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany, ManyToMany, JoinTable } from "typeorm";
 import { hash } from 'bcrypt';
 import { Customer } from "src/customers/entity/customer.entity";
+import { Rol } from "src/roles/rol.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -24,6 +25,20 @@ export class User {
 
     @Column({ default: false }) // Aquí se agrega el campo isAdmin con default false
     isAdmin: boolean;
+
+    @JoinTable({
+        name: 'user_has_roles',
+        joinColumn: {
+            name: 'id_user'
+        },
+        inverseJoinColumn: {
+            name: 'id_rol'
+        }
+    })
+    @ManyToMany(() => Rol, (rol) => rol.users)
+    roles: Rol[];
+
+
     
     @Column()
     password: string;
