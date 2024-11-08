@@ -80,7 +80,7 @@ export class AuthService {
           throw new  HttpException('La contraseña es incorrecta', HttpStatus.FORBIDDEN);
         }
 
-        const rolesIds = userFound.roles.map(rol => rol.id);
+        const rolesIds = userFound.roles.map(rol => rol.name);
 
         const payload = {id: userFound.id, name: userFound.name};
         const token = this.jwtService.sign(payload)
