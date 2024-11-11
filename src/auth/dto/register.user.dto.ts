@@ -8,11 +8,13 @@ export class RegisterUserDto {
     @IsString()
     lastname: string;
 
- 
     @IsString()
     @IsEmail()
     email: string;
 
+    sucusalIds: string[];
+
+    puesto: string;
 
     @IsString()
     phone: string;
@@ -22,6 +24,8 @@ export class RegisterUserDto {
     password: string;
 
     rolesIds: string[];
+
+    notificationToken?: string;
 
     refreshToken: string;
 }

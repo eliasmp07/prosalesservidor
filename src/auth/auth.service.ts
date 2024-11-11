@@ -11,12 +11,14 @@ import { ConfigService } from '@nestjs/config';
 import { MailService } from './service/MailService';
 import { resetPasswordDto } from './dto/reset-password.dto';
 import { Rol } from 'src/roles/rol.entity';
+import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 
 @Injectable()
 export class AuthService {
 
     constructor(
       @InjectRepository(Rol) private rolesRepository: Repository<Rol>,
+      @InjectRepository(Sucursales) private sucusalesRepository: Repository<Sucursales>,
         @InjectRepository(User) private usersRepository: Repository<User>,
         private jwtService: JwtService,
     private configService: ConfigService
@@ -39,6 +41,20 @@ export class AuthService {
             ...user,
             refreshToken: '' // O null, si has cambiado la columna a permitir NULL
         });
+
+        let sucusalesIds = [];
+
+        if(user.sucusalIds !== undefined && user.sucusalIds != null){
+          sucusalesIds = user.sucusalIds
+        }else{
+          sucusalesIds.push('Propapel Merida')
+        }
+
+        const sucursales = await this.sucusalesRepository.findBy({
+          id: In(sucusalesIds)
+        });
+
+        newUser.sucursales = sucursales
 
         let rolesIds = [];
         
@@ -66,7 +82,7 @@ export class AuthService {
         const {email, password} = loginRequest
         const userFound = await this.usersRepository.findOne({
           where : { email: email },
-          relations: ['roles']
+          relations: ['roles', 'sucursales']
 
         });
 
@@ -79,6 +95,8 @@ export class AuthService {
         if(!isPasswordValid){
           throw new  HttpException('La contraseña es incorrecta', HttpStatus.FORBIDDEN);
         }
+
+        const sucursalesIds = userFound.sucursales.map(sucursal => sucursal.nombre);
 
         const rolesIds = userFound.roles.map(rol => rol.name);
 
@@ -93,11 +111,11 @@ export class AuthService {
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
           roles: rolesIds,
+          sucursales: sucursalesIds,
           accessTokenExpirationTimestamp: accessTokenExpirationTimestamp,
           userId: payload.id,
           lastname: userFound.lastname,
           name: userFound.name,
-          isAdmin: userFound.isAdmin,
           email: userFound.email,
           image: userFound.image
       }

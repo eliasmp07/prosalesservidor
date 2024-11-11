@@ -26,7 +26,6 @@ export class UsersService {
       name: user.name,
       phone: user.phone,
       image: user.image,
-      isAdmin: user.isAdmin,
     }));
 
     return {

@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany, ManyTo
 import { hash } from 'bcrypt';
 import { Customer } from "src/customers/entity/customer.entity";
 import { Rol } from "src/roles/rol.entity";
+import { Sucursales } from "src/sucursales/entities/sucursale.entity";
 
 @Entity({ name: 'users' })
 export class User {
@@ -16,15 +17,15 @@ export class User {
 
     @Column({ unique: true })
     email: string;
+
+    @Column()
+    puesto: string;
     
     @Column({nullable: true})
     phone: string;
     
     @Column({ nullable: true })
     image: string;
-
-    @Column({ default: false }) // Aquí se agrega el campo isAdmin con default false
-    isAdmin: boolean;
 
     @JoinTable({
         name: 'user_has_roles',
@@ -38,7 +39,8 @@ export class User {
     @ManyToMany(() => Rol, (rol) => rol.users)
     roles: Rol[];
 
-
+    @ManyToMany(() => Sucursales, (sucursal) => sucursal.usuarios)
+    sucursales: Sucursales[];
     
     @Column()
     password: string;

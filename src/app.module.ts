@@ -11,6 +11,7 @@ import { InterationModule } from './interation/interation.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { RemiderModule } from './remider/remider.module';
 import { RolesModule } from './roles/roles.module';
+import { SucursalesModule } from './sucursales/sucursales.module';
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import { RolesModule } from './roles/roles.module';
     OportunityModule,
     InterationModule,
     PurchaseModule,
-    RemiderModule
+    RemiderModule,
+    SucursalesModule
   ],
   controllers: [AppController],
   providers: [AppService],

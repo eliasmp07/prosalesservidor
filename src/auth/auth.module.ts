@@ -10,11 +10,13 @@ import { AccessTokenStrategy } from './jwt.strategy';
 import { MailService } from './service/MailService';
 import { RolesService } from 'src/roles/roles.service';
 import { Rol } from 'src/roles/rol.entity';
+import { SucursalesService } from 'src/sucursales/sucursales.service';
+import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot(), // Ensure that this is correctly configured
-    TypeOrmModule.forFeature([User, Rol]),
+    TypeOrmModule.forFeature([User, Rol, Sucursales]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -24,7 +26,7 @@ import { Rol } from 'src/roles/rol.entity';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy, MailService, RolesService],
+  providers: [SucursalesService, AuthService, AccessTokenStrategy, RefreshTokenStrategy, MailService, RolesService],
   controllers: [AuthController],
 })
 export class AuthModule {}
