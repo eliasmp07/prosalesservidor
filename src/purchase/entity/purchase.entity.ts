@@ -15,6 +15,9 @@ export class Purchase {
   @Column()
   purchase_date: number;
 
+  @Column({ default: false })
+  isIntoProduct: boolean;  
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;
 }
