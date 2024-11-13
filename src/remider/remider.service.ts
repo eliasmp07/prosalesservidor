@@ -82,4 +82,15 @@ export class RemiderService {
         await this.reminderRepository.save(updateReminderObject);
     }
     
+    async deleteReminder(reminderId: number) {
+        // Buscar el recordatorio por su ID
+        const reminder = await this.reminderRepository.findOne({
+            where: {
+                reminder_id: reminderId
+            },
+        });
+    
+        // Eliminar el recordatorio
+        await this.reminderRepository.remove(reminder);
+    }
 }
