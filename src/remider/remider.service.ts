@@ -4,6 +4,7 @@ import { Reminder } from './entity/remider.entity';
 import { Repository } from 'typeorm';
 import { CreateOnlyReminderDto } from './dto/create-only-reminder.dto';
 import { Customer } from 'src/customers/entity/customer.entity';
+import { UpdateReminderDto } from './dto/update_reminder.dto';
 
 @Injectable()
 export class RemiderService {
@@ -65,6 +66,20 @@ export class RemiderService {
         });
         
         return this.reminderRepository.save(reminder);  // Guarda el recordatorio en la base de datos
+    }
+
+    async updateReminder(reminderId: number, updateReminder: UpdateReminderDto){
+        const reminder = await this.reminderRepository.findOneBy(
+            {
+                reminder_id: reminderId
+            }
+        )
+        reminder.description = updateReminder.description
+        reminder.is_completed = updateReminder.is_completed
+        reminder.reminder_date = updateReminder.reminder_date
+
+        const updateReminderObject = Object.assign(reminder, updateReminder)
+        await this.reminderRepository.save(updateReminderObject);
     }
     
 }
