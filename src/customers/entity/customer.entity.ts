@@ -4,6 +4,7 @@ import { Interaction } from '../../interation/entity/interation.entity';
 import { Purchase } from '../../purchase/entity/purchase.entity';
 import { Reminder } from '../../remider/entity/remider.entity';
 import { User } from 'src/users/user.entity';
+import { Project } from 'src/projects/entities/project.entity';
 
 
 @Entity('customers')
@@ -25,6 +26,10 @@ export class Customer {
 
   @ManyToOne(() => User, user => user.customers)
   user: User;
+
+  @OneToMany(() => Project, project => project.customer)
+  projects: Project[];
+
 
   @Column({ nullable: true })
   address: string;

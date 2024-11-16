@@ -1,4 +1,5 @@
 import { Customer } from 'src/customers/entity/customer.entity';
+import { Project } from 'src/projects/entities/project.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity('purchases')
@@ -17,6 +18,9 @@ export class Purchase {
 
   @Column({ default: false })
   isIntoProduct: boolean;  
+
+  @ManyToOne(() => Project, project => project.products)
+  project: Project;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   amount: number;

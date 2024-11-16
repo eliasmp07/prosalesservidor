@@ -17,6 +17,28 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
+  async findUserBySucursalId(sucursalId: number) {
+    const users = await this.usersRepository.find({
+        where: {
+            sucursales: {
+                id: sucursalId
+            }
+        },
+        relations: [
+            'sucursales',
+            'roles',
+            'customers',
+            'customers.opportunities',
+            'customers.interactions',
+            'customers.purchases',
+            'customers.reminders',
+            'customers.projects'
+        ] // Especifica todas las relaciones requeridas
+    });
+    return users;
+}
+
+
   async findAll() {
     const user = await this.usersRepository.find();
     const users = await this.usersRepository.find();

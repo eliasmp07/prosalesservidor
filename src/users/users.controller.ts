@@ -20,6 +20,13 @@ export class UsersController {
         return this.usersService.findAll();
     }
 
+    @Get("getUserBySucursal/:sucursalId")
+    findUserBySucursal(
+        @Param('sucursalId', ParseIntPipe) id: number,
+    ){
+        return this.usersService.findUserBySucursalId(id)
+    }
+
     @Post() // http://localhost/users -> POST 
     create(@Body() user: CreateUserDto) {
         return this.usersService.create(user);
