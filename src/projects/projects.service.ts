@@ -79,6 +79,7 @@ export class ProjectsService {
     // Crear registro de cancelación en la tabla auxiliar
     const cancellation = new ProjectCancellation();
     cancellation.project = project;
+    cancellation.comments = deleteProject.comments;
     cancellation.cancellationReason = deleteProject.motivos;
     cancellation.competencia = deleteProject.competencia;
 

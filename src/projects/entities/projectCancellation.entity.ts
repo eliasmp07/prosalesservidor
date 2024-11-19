@@ -13,6 +13,9 @@ export class ProjectCancellation {
     project: Project;
 
     @Column()
+    comments: string,
+
+    @Column()
     cancellationReason: string;
 
     @Column()
