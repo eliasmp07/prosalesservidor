@@ -2,19 +2,25 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { DeleteProjectDto } from './dto/delete_project.dto';
 
 @Controller('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.create(createProjectDto);
   }
 
-  @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  @Get("findProjectById/:id")
+  findAll(@Param('id') id: number) {
+    return this.projectsService.findAllByCustomerId(id);
+  }
+
+  @Delete('delete/:id')
+  deleteProject(@Param('id') id: number, @Body() deleteProject: DeleteProjectDto){
+    this.projectsService.cancelProject(id, deleteProject)
   }
 
   @Get(':id')

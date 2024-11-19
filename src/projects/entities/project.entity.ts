@@ -1,6 +1,7 @@
 import { Customer } from "src/customers/entity/customer.entity";
 import { Purchase } from "src/purchase/entity/purchase.entity";
 import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ProjectCancellation } from "./projectCancellation.entity";
 
 @Entity({ name: 'project' })
 export class Project {
@@ -22,8 +23,14 @@ export class Project {
     @Column()
     status: string;
 
+    @Column()
+    prioridad: string;
+
     @OneToMany(() => Purchase,(purchase) => purchase.project)
     products: Purchase[];
+
+    @OneToMany(() => ProjectCancellation, (cancellation) => cancellation.project)
+    cancellations: ProjectCancellation[];  // Relación con la tabla auxiliar
 
     @Column({ default: false })
     isCancel: boolean;

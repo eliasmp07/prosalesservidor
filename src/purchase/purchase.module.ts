@@ -19,11 +19,12 @@ import { Reminder } from 'src/remider/entity/remider.entity';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { UsersController } from 'src/users/users.controller';
+import { Project } from 'src/projects/entities/project.entity';
 
 @Module({
   imports:[
     TypeOrmModule.forFeature([
-      Purchase, Customer, Opportunity, Interaction, Reminder, User
+      Purchase, Customer, Opportunity, Interaction, Reminder, User, Project
     ]),
     ConfigModule,
   ],
