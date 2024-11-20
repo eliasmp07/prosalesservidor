@@ -1,11 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, AfterLoad, BeforeInsert } from 'typeorm';
 import { Opportunity } from '../../oportunity/entity/oportunity.entity';
 import { Interaction } from '../../interation/entity/interation.entity';
 import { Purchase } from '../../purchase/entity/purchase.entity';
 import { Reminder } from '../../remider/entity/remider.entity';
 import { User } from 'src/users/user.entity';
 import { Project } from 'src/projects/entities/project.entity';
-
 
 @Entity('customers')
 export class Customer {
@@ -24,12 +23,14 @@ export class Customer {
   @Column()
   phone_number: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  progressLead: number;
+
   @ManyToOne(() => User, user => user.customers)
   user: User;
 
-  @OneToMany(() => Project, project => project.customer)
+  @OneToMany(() => Project, project => project.customer, { eager: true })
   projects: Project[];
-
 
   @Column({ nullable: true })
   address: string;
@@ -49,10 +50,49 @@ export class Customer {
   @OneToMany(() => Reminder, reminder => reminder.customer)
   reminders: Reminder[];
 
-  
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
-  
+
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  /**
+   * Método explícito para calcular el progreso.
+   */
+  calculateProgress() {
+    let progress = 10.0;
+
+    if (this.interactions && this.interactions.length > 0) {
+      progress += 15.0;
+    }
+
+    if (this.purchases && this.purchases.length > 0) {
+      progress += 15.0;
+    }
+
+    if(this.projects && this.projects.length > 0){
+      progress += 20.0;
+    }
+
+    if (this.projects && this.projects.length > 0) {
+      this.projects.forEach((project) => {
+        if (project.status === 'En negociacion') {
+          progress += 30.0;
+        } else if (project.status === 'Cierre') {
+          progress += 40.0;
+        }
+      });
+    }
+
+    this.progressLead = Math.min(progress, 100.0);
+
+  }
+
+  /**
+   * Trigger opcional para actualizar automáticamente al cargar la entidad.
+   */
+  @AfterLoad()
+  autoUpdateProgress() {
+    this.calculateProgress();
+  }
 }

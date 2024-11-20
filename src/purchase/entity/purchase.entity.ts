@@ -22,6 +22,6 @@ export class Purchase {
   @ManyToOne(() => Project, project => project.products)
   project: Project;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2 , default: 0.0})
   amount: number;
 }

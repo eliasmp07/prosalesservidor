@@ -92,8 +92,10 @@ export class CustomersService {
                 customer_id: customerId
             }
         });
+        
+        await this.customersRepository.save(customer); // Persistir el progreso calculado
     
-        return customer; // Es buena práctica devolver o manejar el valor encontrado.
+        return customer; 
     }
     
   
@@ -104,7 +106,12 @@ export class CustomersService {
             relations: ['opportunities', 'interactions','purchases','reminders']
      
         });
-        return { customers: getMyCustomers };
+        getMyCustomers.forEach(function (items) {
+          items.calculateProgress();
+        });
+        const customer = await Promise.all(getMyCustomers.map(customer => this.customersRepository.save(customer))); // Guardar cambios
+        return { customers: customer };
+        
     }
 
     async getAllCustomer(){

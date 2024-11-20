@@ -18,6 +18,11 @@ export class ProjectsController {
     return this.projectsService.findAllByCustomerId(id);
   }
 
+  @Post("closeProject/:id")
+  closeProject(@Param('id') id: number){
+    return this.projectsService.completeProject(id)
+  }
+
   @Delete('delete/:id')
   deleteProject(@Param('id') id: number, @Body() deleteProject: DeleteProjectDto){
     this.projectsService.cancelProject(id, deleteProject)

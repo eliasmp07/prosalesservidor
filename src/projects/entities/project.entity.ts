@@ -17,7 +17,7 @@ export class Project {
     @Column()
     progress: number;
 
-    @ManyToOne(() => Customer, customer => customer.projects, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Customer, customer => customer.projects, { onDelete: 'CASCADE' ,})
     customer: Customer;
 
     @Column()
@@ -40,5 +40,6 @@ export class Project {
     
     @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
     updated_at: Date;
+    
 
 }

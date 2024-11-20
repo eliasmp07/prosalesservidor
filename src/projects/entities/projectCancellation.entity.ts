@@ -13,7 +13,7 @@ export class ProjectCancellation {
     project: Project;
 
     @Column()
-    comments: string,
+    comments: string;
 
     @Column()
     cancellationReason: string;

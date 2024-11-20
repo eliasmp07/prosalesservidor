@@ -19,10 +19,11 @@ import { PurchaseController } from 'src/purchase/purchase.controller';
 import { RemiderController } from 'src/remider/remider.controller';
 import { Opportunity } from 'src/oportunity/entity/oportunity.entity';
 import { OportunityController } from 'src/oportunity/oportunity.controller';
+import { Project } from 'src/projects/entities/project.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder]),
+    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder, Project]),
     ConfigModule, // Importa ConfigModule aquí
   ],
   providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService],

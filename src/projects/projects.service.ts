@@ -20,6 +20,15 @@ export class ProjectsService {
   ){
 
   }
+
+  async completeProject(projectId: number){
+    const project = await this.projectRepository.findOne({ where: { id: projectId }, relations: ['customer', 'products'], });
+    console.log(project)
+    project.status = 'Cierre';
+    project.progress = 100.00;
+    const newProject =  await this.projectRepository.save(project);
+    return newProject;
+  }
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     // Buscar el cliente por su ID
     const customer = await this.customerRepository.findOneBy({
