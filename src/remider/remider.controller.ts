@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { RemiderService } from './remider.service';
 import { CreateOnlyReminderDto } from './dto/create-only-reminder.dto';
 import { UpdateReminderDto } from './dto/update_reminder.dto';
@@ -18,6 +18,11 @@ export class RemiderController {
     @Get('getMyReminders/:id')
     getAllMyReminders(@Param('id', ParseIntPipe) id: number){
         return this.reminderService.getAllRemindersByUser(id)
+    }
+
+    @Put('completeReminder/:id')
+    completeReminder(@Param('id')id: number){
+        this.reminderService.completeReminder(id)
     }
 
     @Post('create')

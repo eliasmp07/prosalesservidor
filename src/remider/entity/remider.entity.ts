@@ -13,6 +13,7 @@ export class Reminder {
   @Column({ type: 'bigint' })
   reminder_date: number;
 
+
   @Column()
   description: string;
 

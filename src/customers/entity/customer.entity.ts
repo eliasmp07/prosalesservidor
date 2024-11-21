@@ -26,7 +26,7 @@ export class Customer {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   progressLead: number;
 
-  @ManyToOne(() => User, user => user.customers)
+  @ManyToOne(() => User, user => user.customers,{ eager: true })
   user: User;
 
   @OneToMany(() => Project, project => project.customer, { eager: true })
@@ -59,40 +59,48 @@ export class Customer {
   /**
    * Método explícito para calcular el progreso.
    */
-  calculateProgress() {
-    let progress = 10.0;
-
-    if (this.interactions && this.interactions.length > 0) {
-      progress += 15.0;
-    }
-
-    if (this.purchases && this.purchases.length > 0) {
-      progress += 15.0;
-    }
-
-    if(this.projects && this.projects.length > 0){
-      progress += 20.0;
-    }
-
-    if (this.projects && this.projects.length > 0) {
-      this.projects.forEach((project) => {
-        if (project.status === 'En negociacion') {
-          progress += 30.0;
-        } else if (project.status === 'Cierre') {
-          progress += 40.0;
+  calculateProgress(userId: number) {
+    if (userId == this.user.id) {
+      let progress = 10.0;
+  
+      if (this.interactions && this.interactions.length > 0) {
+        progress += 15.0;
+      }
+  
+      if (this.purchases && this.purchases.length > 0) {
+        progress += 15.0;
+      }
+  
+      if (this.projects && this.projects.length > 0) {
+        progress += 20.0;
+  
+        let hasCierre = false;
+        let allPerdido = true;
+  
+        this.projects.forEach((project) => {
+          if (project.status === 'Cierre') {
+            hasCierre = true;
+          } else if (project.status !== 'Perdido') {
+            allPerdido = false;
+          }
+        });
+  
+        if (hasCierre) {
+          progress = 100.0; // Si al menos un proyecto tiene "Cierre", la suma es 100.
+        } else if (allPerdido) {
+          progress = 40.0; // Si todos tienen "Perdido", la suma es 40.
+        } else {
+          // Cálculo original si no aplica ninguna de las reglas anteriores.
+          this.projects.forEach((project) => {
+            if (project.status === 'En negociacion') {
+              progress = 90;
+            } 
+          });
         }
-      });
+      }
+  
+      this.progressLead = Math.min(progress, 100.0); // Asegurarse de que no supere 100.
     }
-
-    this.progressLead = Math.min(progress, 100.0);
-
   }
-
-  /**
-   * Trigger opcional para actualizar automáticamente al cargar la entidad.
-   */
-  @AfterLoad()
-  autoUpdateProgress() {
-    this.calculateProgress();
-  }
+  
 }

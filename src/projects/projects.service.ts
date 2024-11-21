@@ -97,6 +97,8 @@ export class ProjectsService {
 
     // Marcar el proyecto como cancelado
     project.isCancel = true;
+    project.status = 'Perdido';
+    project.progress = 60.00;
 
     // Guardar los cambios en el proyecto
     await this.projectRepository.save(project);

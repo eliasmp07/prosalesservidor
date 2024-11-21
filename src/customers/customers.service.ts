@@ -99,20 +99,22 @@ export class CustomersService {
     }
     
   
-
-    async getMyCustomer(id: number){
-        const getMyCustomers = await this.customersRepository.find({
-            where: { user: { id } }, // Filtra por el id del usuario relacionado,
-            relations: ['opportunities', 'interactions','purchases','reminders']
-     
-        });
-        getMyCustomers.forEach(function (items) {
-          items.calculateProgress();
-        });
-        const customer = await Promise.all(getMyCustomers.map(customer => this.customersRepository.save(customer))); // Guardar cambios
-        return { customers: customer };
-        
-    }
+    async getMyCustomer(id: number) {
+      const getMyCustomers = await this.customersRepository.find({
+          where: { user: { id } }, // Filtra por el id del usuario relacionado,
+          relations: ['opportunities', 'interactions', 'purchases', 'reminders']
+      });
+  
+      // Usar map para calcular el progreso y actualizar al mismo tiempo
+      const updatedCustomers = await Promise.all(
+          getMyCustomers.map(async (customer) => {
+              customer.calculateProgress(id);
+              return this.customersRepository.save(customer); // Guardar los cambios
+          })
+      );
+      return { customers: updatedCustomers };
+  }
+  
 
     async getAllCustomer(){
         const customers = await this.customersRepository.find({

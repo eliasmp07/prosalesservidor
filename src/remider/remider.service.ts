@@ -50,7 +50,7 @@ export class RemiderService {
             reminders: filteredReminders,
         };
     }
-    
+
     async createReminder(createReminderDto: CreateOnlyReminderDto) {
         const { customerId, ...reminderData } = createReminderDto;
 
@@ -67,6 +67,19 @@ export class RemiderService {
         
         return this.reminderRepository.save(reminder);  // Guarda el recordatorio en la base de datos
     }
+
+    
+    async completeReminder(reminderId: number){
+        const reminder = await this.reminderRepository.findOneBy(
+            {
+                reminder_id: reminderId
+            }
+        )
+
+        reminder.is_completed = true
+        await this.reminderRepository.save(reminder);
+    }
+    
 
     async updateReminder(reminderId: number, updateReminder: UpdateReminderDto){
         const reminder = await this.reminderRepository.findOneBy(
