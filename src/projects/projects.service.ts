@@ -82,6 +82,20 @@ export class ProjectsService {
     return projects;
   }
 
+  async findAllByUserId(userId: number){
+    const projects = await this.projectRepository.find({
+      where: {
+        customer: {
+          user : {
+            id: userId
+          }
+        },
+      },
+      relations: ['customer', 'products'],
+    });
+
+    return projects;
+  }
   async cancelProject(projectId: number, deleteProject: DeleteProjectDto): Promise<Project> {
     const project = await this.projectRepository.findOne({ where: { id: projectId } });
 

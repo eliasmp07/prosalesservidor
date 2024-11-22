@@ -18,6 +18,11 @@ export class ProjectsController {
     return this.projectsService.findAllByCustomerId(id);
   }
 
+  @Get("findProjectByUserId/:id")
+  findProjectByUserId(@Param('id') id: number) {
+    return this.projectsService.findAllByUserId(id);
+  }
+
   @Post("closeProject/:id")
   closeProject(@Param('id') id: number){
     return this.projectsService.completeProject(id)
