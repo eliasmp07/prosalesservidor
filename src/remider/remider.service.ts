@@ -89,6 +89,7 @@ export class RemiderService {
         )
         reminder.description = updateReminder.description
         reminder.is_completed = updateReminder.is_completed
+        reminder.typeAppointment = updateReminder.typeAppointment
         reminder.reminder_date = updateReminder.reminder_date
 
         const updateReminderObject = Object.assign(reminder, updateReminder)

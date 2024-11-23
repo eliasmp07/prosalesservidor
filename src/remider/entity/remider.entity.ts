@@ -10,13 +10,21 @@ export class Reminder {
   @ManyToOne(() => Customer, customer => customer.reminders)
   customer: Customer;
 
+  @Column()
+  typeAppointment: string;
+
   @Column({ type: 'bigint' })
   reminder_date: number;
-
 
   @Column()
   description: string;
 
   @Column({ default: false })
   is_completed: boolean;
+
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  created_at: Date;
+
+  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  updated_at: Date;
 }
