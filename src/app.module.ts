@@ -18,11 +18,11 @@ import { ProjectsModule } from './projects/projects.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'ls-d15d7c88b665b422df22d34c558f4a76fb630807.cpmyqs2ek0ii.us-east-2.rds.amazonaws.com',
+      host: process.env.HOST_DB,
       port: 3306,
-      username: 'root',
-      password: 'optivosa1',
-      database: 'prosales',
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
