@@ -13,7 +13,7 @@ export class Purchase {
   @Column()
   product_service_name: string;
 
-  @Column()
+  @Column({ type: 'bigint' })
   purchase_date: number;
 
   @Column({ default: false })

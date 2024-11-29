@@ -28,19 +28,17 @@ export class UsersService {
             'sucursales',
             'roles',
             'customers',
-            'customers.opportunities',
             'customers.interactions',
             'customers.purchases',
             'customers.reminders',
             'customers.projects'
         ] // Especifica todas las relaciones requeridas
     });
-    return users;
+   return {users: users};
 }
 
 
   async findAll() {
-    const user = await this.usersRepository.find();
     const users = await this.usersRepository.find();
 
     const data = users.map((user) => ({
@@ -66,6 +64,7 @@ export class UsersService {
     const updatedUser = Object.assign(userFound, user);
     return this.usersRepository.save(updatedUser);
   }
+
 
   async updateWithImage(id: number, user: UpdateUserDto) {
     const userFound = await this.usersRepository.findOneBy({ id: id });

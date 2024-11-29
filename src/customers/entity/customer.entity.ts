@@ -23,7 +23,7 @@ export class Customer {
   @Column()
   phone_number: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   progressLead: number;
 
   @ManyToOne(() => User, user => user.customers,{ eager: true })
