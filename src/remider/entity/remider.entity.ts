@@ -19,7 +19,7 @@ export class Reminder {
   @Column()
   description: string;
 
-  @Column({ default: false })
+  @Column({ default: false})
   is_completed: boolean;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })

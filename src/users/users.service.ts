@@ -98,6 +98,7 @@ export class UsersService {
       phone: newUser.phone,
       image: user.image,
     };
+    console.log()
     return data;
   }
 }

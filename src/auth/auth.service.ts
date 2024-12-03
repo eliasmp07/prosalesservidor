@@ -108,6 +108,7 @@ export class AuthService {
 
         const accessTokenExpirationTimestamp = Math.floor(Date.now() / 1000) + 3600;
         const data = {
+          puesto: userFound.puesto,
           accessToken: tokens.accessToken,
           refreshToken: tokens.refreshToken,
           roles: rolesIds,

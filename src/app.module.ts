@@ -13,6 +13,7 @@ import { RemiderModule } from './remider/remider.module';
 import { RolesModule } from './roles/roles.module';
 import { SucursalesModule } from './sucursales/sucursales.module';
 import { ProjectsModule } from './projects/projects.module';
+import { DocumentsPdfModule } from './documents-pdf/documents-pdf.module';
 
 @Module({
   imports: [
@@ -36,7 +37,8 @@ import { ProjectsModule } from './projects/projects.module';
     PurchaseModule,
     RemiderModule,
     SucursalesModule,
-    ProjectsModule
+    ProjectsModule,
+    DocumentsPdfModule
   ],
   controllers: [AppController],
   providers: [AppService],
