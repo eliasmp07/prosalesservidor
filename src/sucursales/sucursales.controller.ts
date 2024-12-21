@@ -12,7 +12,7 @@ export class SucursalesController {
     return this.sucursalesService.create(createSucursaleDto);
   }
 
-  @Get()
+  @Get('findAll')
   findAll() {
     return this.sucursalesService.findAll();
   }

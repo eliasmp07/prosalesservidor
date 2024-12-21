@@ -19,12 +19,20 @@ export class SucursalesService {
     return this.sucursalRepository.save(newSucusal);
   }
 
-  findAll() {
-    return `This action returns all sucursales`;
+  async findAll() {
+    const sucursales = await this.sucursalRepository.find()
+    return {
+      sucursales: sucursales
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} sucursale`;
+  async findOne(id: number) {
+    const sucursal = await this.sucursalRepository.findOne({
+      where: {
+        id: id
+      }
+    })
+    return sucursal;
   }
 
   update(id: number, updateSucursaleDto: UpdateSucursaleDto) {

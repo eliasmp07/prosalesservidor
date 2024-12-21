@@ -10,6 +10,9 @@ export class Sucursales {
     @Column()
     nombre: string;
 
+    @Column({ nullable: true })
+    image: string;
+
     @Column()
     direccion: string;
 
