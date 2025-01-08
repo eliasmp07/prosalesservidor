@@ -37,6 +37,26 @@ export class UsersService {
    return {users: users};
 }
 
+async getUserById(id: number){
+  const user = await this.usersRepository.findOne(
+    { 
+      where: {
+        id: id
+      },
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects'
+    ]
+    }
+  );
+  return user
+}
+
 
   async findAll() {
     const users = await this.usersRepository.find();
