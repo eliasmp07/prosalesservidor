@@ -44,6 +44,15 @@ export class UsersController {
         return this.usersService.update(id, user);
     }
 
+
+  @Patch(':id/password')
+  async updatePassword(
+    @Param('id') id: number,
+    @Body('password') newPassword: string,
+  ) {
+    return this.usersService.updatePassword(id, newPassword);
+  }
+
     @Put('updateWithImage/:id')
     updateWithImage(
         @Param('id', ParseIntPipe) id: number, @Body() user: UpdateUserDto 

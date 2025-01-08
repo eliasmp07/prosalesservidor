@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import storage = require('../utils/cloud_storage.js');
-
+import { hash } from 'bcrypt';
 @Injectable()
 export class UsersService {
   constructor(
@@ -84,6 +84,27 @@ async getUserById(id: number){
     const updatedUser = Object.assign(userFound, user);
     return this.usersRepository.save(updatedUser);
   }
+
+
+async updatePassword(userId: number, newPassword: string): Promise<{ message: string }> {
+  // 1. Buscar al usuario por su ID
+  const user = await this.usersRepository.findOneBy({ id: userId });
+  if (!user) {
+    throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+  }
+
+  // 2. Hashear la nueva contraseña
+  const hashedPassword = await hash(newPassword, Number(process.env.HAST_SALT));
+
+  // 3. Actualizar la contraseña
+  user.password = hashedPassword;
+
+  // 4. Guardar el usuario con la nueva contraseña
+  await this.usersRepository.save(user);
+
+  // 5. Retornar un mensaje de confirmación
+  return { message: 'Contraseña actualizada correctamente' };}
+
 
 
   async updateWithImage(id: number, user: UpdateUserDto) {
