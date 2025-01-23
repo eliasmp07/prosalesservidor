@@ -15,6 +15,7 @@ import { SucursalesModule } from './sucursales/sucursales.module';
 import { ProjectsModule } from './projects/projects.module';
 import { DocumentsPdfModule } from './documents-pdf/documents-pdf.module';
 import { BannersModule } from './banners/banners.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { BannersModule } from './banners/banners.module';
     SucursalesModule,
     ProjectsModule,
     DocumentsPdfModule,
-    BannersModule
+    BannersModule,
+    AppointmentModule
   ],
   controllers: [AppController],
   providers: [AppService],

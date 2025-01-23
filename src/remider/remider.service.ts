@@ -82,17 +82,17 @@ export class RemiderService {
     
 
     async updateReminder(reminderId: number, updateReminder: UpdateReminderDto){
-        const reminder = await this.reminderRepository.findOneBy(
-            {
+        const reminderFound = await this.reminderRepository.findOne({
+            where : {
                 reminder_id: reminderId
             }
-        )
-        reminder.description = updateReminder.description
-        reminder.is_completed = updateReminder.is_completed
-        reminder.typeAppointment = updateReminder.typeAppointment
-        reminder.reminder_date = updateReminder.reminder_date
+        })
+        reminderFound.typeAppointment = updateReminder.typeAppointment
+        reminderFound.description = updateReminder.typeAppointment
+        reminderFound.reminder_date = updateReminder.reminder_date
+    
 
-        const updateReminderObject = Object.assign(reminder, updateReminder)
+        const updateReminderObject = Object.assign(reminderFound, updateReminder)
         await this.reminderRepository.save(updateReminderObject);
     }
     

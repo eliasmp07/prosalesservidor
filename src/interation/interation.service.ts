@@ -14,6 +14,8 @@ export class InterationService {
         @InjectRepository(Purchase) private purchaseRepository: Repository<Purchase>
     ){}
 
+    
+
     async createInteraction(interaction: CreateOnlyInteractionDto) {
         const customerFound = await this.customersRepository.findOne({
             where: { customer_id: interaction.customerId }

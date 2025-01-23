@@ -115,6 +115,61 @@ export class CustomersService {
       return { customers: updatedCustomers };
   }
   
+  async getAllCustomersBySucursal(){
+    const customers = await this.customersRepository.find({
+      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'projects' ,'user.sucursales']
+  });
+    
+  }
+  /*
+  async categorizeLeads() {
+    const customers = await this.customersRepository.find({
+        relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'projects']
+    });
+
+    // Categorías de clientes
+    const categorizedLeads = {
+        total: customers.length,
+        contactado: [],
+        interesado: [],
+        negociacion: [],
+        cerrado: []
+    };
+
+    customers.forEach((customer) => {
+        if (customer.progressLead === 100) {
+            categorizedLeads.cerrado.push(customer);
+        } else if (
+            customer.projects.some(project => project.status === 'En negociacion')
+        ) {
+            categorizedLeads.negociacion.push(customer);
+        } else if (customer.purchases && customer.purchases.length > 0) {
+            categorizedLeads.interesado.push(customer);
+        } else if (customer.interactions && customer.interactions.length > 0) {
+            categorizedLeads.contactado.push(customer);
+        }
+    });
+
+    return categorizedLeads;
+}
+*/
+async  categorizeLeads() {
+  const customers = await this.customersRepository.find({
+      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'projects']
+  });
+
+  const funnelData = {
+      prospectos: customers.length,
+      contactados: customers.filter(c => c.interactions && c.interactions.length > 0).length,
+      interesados: customers.filter(c => c.purchases && c.purchases.length > 0).length,
+      negociacion: customers.filter(c => c.projects.some(p => p.status === 'En negociacion')).length,
+      cerrados: customers.filter(c => c.projects.some(p => p.status === 'Cierre') || c.progressLead === 100).length,
+  };
+
+  return funnelData;
+}
+
+
 
     async getAllCustomer(){
         const customers = await this.customersRepository.find({

@@ -26,6 +26,11 @@ export class CustomersController {
         return this.customerService.getMyCustomer(id)
     }
 
+    @Get("getCategorizedCustomers")
+    getCategorizedCustomer(){
+        return this.customerService.categorizeLeads()
+    }
+
     @Get("getAllCustomers")
     getAllCustomers(){
         return this.customerService.getAllCustomer()

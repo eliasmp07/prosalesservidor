@@ -11,7 +11,8 @@ export class Project {
     @Column()
     nameProject: string;
     
-    @Column({ type: 'decimal', precision: 10, scale: 2 })
+
+  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0.0 })
     valorProject: number;
     
     @Column()

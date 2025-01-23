@@ -20,13 +20,16 @@ import { RemiderController } from 'src/remider/remider.controller';
 import { Opportunity } from 'src/oportunity/entity/oportunity.entity';
 import { OportunityController } from 'src/oportunity/oportunity.controller';
 import { Project } from 'src/projects/entities/project.entity';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
+import { AppointmentService } from 'src/appointment/appointment.service';
+import { AppointmentController } from 'src/appointment/appointment.controller';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder, Project]),
+    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder, Project, Appointment]),
     ConfigModule, // Importa ConfigModule aquí
   ],
-  providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService],
-  controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController]
+  providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService, AppointmentService],
+  controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController, AppointmentController]
 })
 export class CustomersModule {}

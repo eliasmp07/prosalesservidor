@@ -37,6 +37,24 @@ export class UsersService {
    return {users: users};
 }
 
+async findAllUsers(){
+  const users = await this.usersRepository.find({
+    relations: [
+      'sucursales',
+      'roles',
+      'customers',
+      'customers.interactions',
+      'customers.purchases',
+      'customers.reminders',
+      'customers.projects'
+  ]
+  });
+
+  return {
+    users : users
+  }
+}
+
 async getUserById(id: number){
   const user = await this.usersRepository.findOne(
     { 
@@ -51,7 +69,8 @@ async getUserById(id: number){
         'customers.purchases',
         'customers.reminders',
         'customers.projects'
-    ]
+    ],
+
     }
   );
   return user

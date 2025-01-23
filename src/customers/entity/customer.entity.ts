@@ -5,6 +5,7 @@ import { Purchase } from '../../purchase/entity/purchase.entity';
 import { Reminder } from '../../remider/entity/remider.entity';
 import { User } from 'src/users/user.entity';
 import { Project } from 'src/projects/entities/project.entity';
+import { Appointment } from 'src/appointment/entities/appointment.entity';
 
 @Entity('customers')
 export class Customer {
@@ -35,7 +36,7 @@ export class Customer {
   @Column({ nullable: true })
   address: string;
 
-  @Column({ type: 'enum', enum: ['NUEVO', 'RECUPERACIÓN', 'DESARROLLO'] })
+  @Column()
   type_of_client: string;
 
   @OneToMany(() => Opportunity, opportunity => opportunity.customer)
@@ -49,7 +50,7 @@ export class Customer {
 
   @OneToMany(() => Reminder, reminder => reminder.customer)
   reminders: Reminder[];
-
+  
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 

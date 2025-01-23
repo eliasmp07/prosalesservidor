@@ -15,9 +15,11 @@ export class UsersController {
     // DELETE ' => BORRAR
 
     //@UseGuards(JwtAuthGuard)
+
+
     @Get("getAllUsers")
-    findAll(){
-        return this.usersService.findAll();
+    findAllUsers(){
+        return this.usersService.findAllUsers()
     }
 
     @Get("getUserBySucursal/:sucursalId")

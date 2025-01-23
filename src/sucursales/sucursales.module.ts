@@ -3,9 +3,12 @@ import { SucursalesService } from './sucursales.service';
 import { SucursalesController } from './sucursales.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Sucursales } from './entities/sucursale.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Sucursales])],
+  imports:[
+    ConfigModule.forRoot(),
+    TypeOrmModule.forFeature([Sucursales])],
   controllers: [SucursalesController],
   providers: [SucursalesService],
 })
