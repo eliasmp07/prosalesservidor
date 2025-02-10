@@ -22,6 +22,11 @@ export class UsersController {
         return this.usersService.findAllUsers()
     }
 
+    @Get("getUserAllSucursales")
+    findUserByAllSucursales(){
+        return this.usersService.findUserBySucursale();
+    }
+
     @Get("getUserBySucursal/:sucursalId")
     findUserBySucursal(
         @Param('sucursalId', ParseIntPipe) id: number,

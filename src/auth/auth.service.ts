@@ -12,6 +12,7 @@ import { MailService } from './service/MailService';
 import { resetPasswordDto } from './dto/reset-password.dto';
 import { Rol } from 'src/roles/rol.entity';
 import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
+import storage = require('../utils/cloud_storage.js');
 
 @Injectable()
 export class AuthService {
@@ -67,6 +68,16 @@ export class AuthService {
         
         const roles = await this.rolesRepository.findBy({ id: In(rolesIds) });
         newUser.roles = roles;
+
+        if (user.image != '') {
+              const buffer = Buffer.from(user.image, 'base64'); // Asegúrate de que image sea una cadena Base64 válida
+              const pathImage = `profilePhoto_${Date.now()}`;
+              const imageUrl = await storage(buffer, pathImage);
+        
+              if (imageUrl) {
+                newUser.image = imageUrl; // Actualiza la URL de la imagen en el objeto user
+              }
+            }
 
     await this.usersRepository.save(newUser); 
 

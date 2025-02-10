@@ -13,5 +13,12 @@ export class RolesService {
         const newRol = this.rolesRepository.create(rol);
         return this.rolesRepository.save(newRol);
     }
+    
+    async getAllRoles() {
+        const rolesFound = await this.rolesRepository.find()
+        return {
+            roles: rolesFound
+        };
+    }
 
 }

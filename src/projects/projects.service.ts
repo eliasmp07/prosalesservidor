@@ -29,12 +29,14 @@ export class ProjectsService {
     const newProject =  await this.projectRepository.save(project);
     return newProject;
   }
+
+
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     // Buscar el cliente por su ID
     const customer = await this.customerRepository.findOneBy({
       customer_id: Number(createProjectDto.customerId)
     });
-
+    console.log(createProjectDto.valorProject)
     // Crear el nuevo proyecto
     const newProject = this.projectRepository.create({
       nameProject: createProjectDto.nameProject,

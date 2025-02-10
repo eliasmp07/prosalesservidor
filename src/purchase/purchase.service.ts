@@ -23,6 +23,8 @@ export class PurchaseService {
                 }
             }
         )
+
+        console.log(purchase.amount)
         const purchaseCreate = this.purchaseRepository.create({
             product_service_name: purchase.product_service_name,
             purchase_date: purchase.purchase_date,

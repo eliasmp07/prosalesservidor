@@ -19,6 +19,8 @@ export class RegisterUserDto {
     @IsString()
     phone: string;
 
+    image: string;
+
     @IsString()
     @MinLength(6, {message: 'La contraseña tiene que ser minimo de 6 caracteres'})
     password: string;

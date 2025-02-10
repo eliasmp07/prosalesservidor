@@ -6,10 +6,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import storage = require('../utils/cloud_storage.js');
 import { hash } from 'bcrypt';
+import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(User) private usersRepository: Repository<User>
   ) {}
 
   create(user: CreateUserDto) {
@@ -74,6 +75,47 @@ async getUserById(id: number){
     }
   );
   return user
+}
+
+  async getAllUserBySucursales(){
+    
+    const users = await this.usersRepository.find({
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects'
+    ]
+    });
+  }
+
+  async findUserBySucursale() {
+    const usersFound = await this.usersRepository.find({
+        relations: [ 
+          'sucursales',
+          'roles',
+          'customers',
+          'customers.interactions',
+          'customers.purchases',
+          'customers.reminders',
+          'customers.projects']
+    });
+
+    const merida = "Propapel Merida";
+    const mty = "Propapel Monterrey";
+    const mexico = "Propapel Mexico";
+
+    // Filtrar los usuarios por sucursal
+    const usersBySucursal = {
+        merida: usersFound.filter(user => user.sucursales.some(sucursal => sucursal.nombre === merida)),
+        monterrey: usersFound.filter(user => user.sucursales.some(sucursal => sucursal.nombre === mty)),
+        mexico: usersFound.filter(user => user.sucursales.some(sucursal => sucursal.nombre === mexico)),
+    };
+
+    return usersBySucursal;
 }
 
 
