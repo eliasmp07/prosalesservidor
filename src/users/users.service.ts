@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import storage = require('../utils/cloud_storage.js');
+import { Not, Like } from "typeorm";
 import { hash } from 'bcrypt';
 import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 @Injectable()
@@ -18,12 +19,11 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
-  async findUserBySucursalId(sucursalId: number) {
+async findUserBySucursalId(sucursalId: number) { 
     const users = await this.usersRepository.find({
         where: {
-            sucursales: {
-                id: sucursalId
-            }
+            sucursales: { id: sucursalId },
+            email: Like('%@propapel.com.mx') // Filtrar solo correos que terminen en @propapel.com.mx
         },
         relations: [
             'sucursales',
@@ -33,13 +33,16 @@ export class UsersService {
             'customers.purchases',
             'customers.reminders',
             'customers.projects'
-        ] // Especifica todas las relaciones requeridas
+        ]
     });
-   return {users: users};
+    return { users };
 }
 
 async findAllUsers(){
   const users = await this.usersRepository.find({
+    where: {
+      email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
+    },
     relations: [
       'sucursales',
       'roles',
@@ -48,19 +51,17 @@ async findAllUsers(){
       'customers.purchases',
       'customers.reminders',
       'customers.projects'
-  ]
+    ]
   });
 
-  return {
-    users : users
-  }
+  return { users };
 }
 
 async getUserById(id: number){
-  const user = await this.usersRepository.findOne(
-    { 
+  const user = await this.usersRepository.findOne({ 
       where: {
-        id: id
+        id: id,
+        email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
       },
       relations: [
         'sucursales',
@@ -70,30 +71,33 @@ async getUserById(id: number){
         'customers.purchases',
         'customers.reminders',
         'customers.projects'
-    ],
-
-    }
-  );
-  return user
+      ]
+  });
+  return user;
 }
 
-  async getAllUserBySucursales(){
-    
-    const users = await this.usersRepository.find({
-      relations: [
-        'sucursales',
-        'roles',
-        'customers',
-        'customers.interactions',
-        'customers.purchases',
-        'customers.reminders',
-        'customers.projects'
+async getAllUserBySucursales(){
+  const users = await this.usersRepository.find({
+    where: {
+      email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
+    },
+    relations: [
+      'sucursales',
+      'roles',
+      'customers',
+      'customers.interactions',
+      'customers.purchases',
+      'customers.reminders',
+      'customers.projects'
     ]
-    });
-  }
+  });
+}
 
-  async findUserBySucursale() {
+async findUserBySucursale() {
     const usersFound = await this.usersRepository.find({
+        where: {
+            email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
+        },
         relations: [ 
           'sucursales',
           'roles',
@@ -101,7 +105,8 @@ async getUserById(id: number){
           'customers.interactions',
           'customers.purchases',
           'customers.reminders',
-          'customers.projects']
+          'customers.projects'
+        ]
     });
 
     const merida = "Propapel Merida";
@@ -118,9 +123,12 @@ async getUserById(id: number){
     return usersBySucursal;
 }
 
-
-  async findAll() {
-    const users = await this.usersRepository.find();
+async findAll() {
+    const users = await this.usersRepository.find({
+        where: {
+            email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
+        }
+    });
 
     const data = users.map((user) => ({
       lastname: user.lastname,
@@ -129,10 +137,8 @@ async getUserById(id: number){
       image: user.image,
     }));
 
-    return {
-      users: data,
-    };
-  }
+    return { users: data };
+}
 
   async update(id: number, user: UpdateUserDto) {
     console.log('ID recibido:', id);
