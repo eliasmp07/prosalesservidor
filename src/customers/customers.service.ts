@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from './entity/customer.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { User } from 'src/users/user.entity';
 import { Reminder } from 'src/remider/entity/remider.entity';
@@ -117,6 +117,11 @@ export class CustomersService {
   
   async getAllCustomersBySucursal(){
     const customers = await this.customersRepository.find({
+      where : {
+        user: {
+           email: Like('%@propapel.com.mx')
+        }
+      },
       relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'projects' ,'user.sucursales']
   });
     
@@ -155,6 +160,11 @@ export class CustomersService {
 */
 async  categorizeLeads() {
   const customers = await this.customersRepository.find({
+    where : {
+      user: {
+         email: Like('%@propapel.com.mx')
+      }
+    },
       relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'projects']
   });
 
@@ -173,6 +183,11 @@ async  categorizeLeads() {
 
     async getAllCustomer(){
         const customers = await this.customersRepository.find({
+          where : {
+            user: {
+               email: Like('%@propapel.com.mx')
+            }
+          },
           relations: ['opportunities', 'interactions','purchases','reminders']
         })
         return {customers: customers}
