@@ -1,7 +1,7 @@
 export class CreateInteractionDto {
-    readonly interaction_id: number; // Relación con cliente
-    readonly interaction_type: string;
-    readonly interaction_date: number;
-    readonly notes?: string;
+  readonly reminder_id: number; // Relación con cliente
+  readonly reminder_date: number;
+  readonly description: string;
+  typeAppointment: string;
+  readonly is_completed?: boolean
   }
-  

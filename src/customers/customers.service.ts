@@ -51,13 +51,15 @@ export class CustomersService {
     
         // Crear las interacciones relacionadas (si se proporcionaron)
         if (interactions) {
-          const interactionEntities = interactions.map(interactionDto => {
-            return this.interactionsRepository.create({
-              ...interactionDto,
+          const reminderEntities = interactions.map(reminderDto => {
+            return this.remindersRepository.create({
+              ...reminderDto,
               customer,
-            });
-          });
-          await this.interactionsRepository.save(interactionEntities);
+            })
+          })
+          
+          await this.remindersRepository.save(reminderEntities);
+          
         }
     
         // Crear las compras relacionadas (si se proporcionaron)

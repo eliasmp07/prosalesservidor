@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@
 import { RemiderService } from './remider.service';
 import { CreateOnlyReminderDto } from './dto/create-only-reminder.dto';
 import { UpdateReminderDto } from './dto/update_reminder.dto';
+import { CloseReminderDto } from './dto/close_reminder.dto';
 
 @Controller('remider')
 export class RemiderController {
@@ -23,6 +24,11 @@ export class RemiderController {
     @Put('completeReminder/:id')
     completeReminder(@Param('id')id: number){
         this.reminderService.completeReminder(id)
+    }
+
+    @Put('closeAppointment')
+    closeAppointment(@Body() closeAppointmentDto: CloseReminderDto){
+        this.reminderService.closeReminder(closeAppointmentDto)
     }
 
     @Post('create')

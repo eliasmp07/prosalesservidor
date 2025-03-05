@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateOnlyReminderDto } from './dto/create-only-reminder.dto';
 import { Customer } from 'src/customers/entity/customer.entity';
 import { UpdateReminderDto } from './dto/update_reminder.dto';
+import { CloseReminderDto } from './dto/close_reminder.dto';
 
 @Injectable()
 export class RemiderService {
@@ -24,6 +25,20 @@ export class RemiderService {
             reminders: reminders
         }
     }
+
+    async closeReminder(closeReminder: CloseReminderDto) {
+        const reminder = await this.reminderRepository.findOneBy(
+            {
+                reminder_id: closeReminder.id
+            }
+        )
+
+        reminder.is_completed = true
+        reminder.description = closeReminder.notes
+
+        await this.reminderRepository.save(reminder);
+}
+
 
     async getAllRemindersByUser(userId: number) {
         // Obtén los recordatorios con las relaciones necesarias

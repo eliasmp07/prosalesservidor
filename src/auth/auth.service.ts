@@ -109,7 +109,7 @@ export class AuthService {
 
         const sucursalesIds = userFound.sucursales.map(sucursal => sucursal.nombre);
 
-        const rolesIds = userFound.roles.map(rol => rol.name);
+        const rolesIds = userFound.roles.map(rol => rol.id);
 
         const payload = {id: userFound.id, name: userFound.name};
         const token = this.jwtService.sign(payload)
