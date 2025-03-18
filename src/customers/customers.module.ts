@@ -25,11 +25,36 @@ import { AppointmentService } from 'src/appointment/appointment.service';
 import { AppointmentController } from 'src/appointment/appointment.controller';
 
 @Module({
-  imports:[
-    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder, Project, Appointment]),
+  imports: [
+    TypeOrmModule.forFeature([
+      Customer,
+      User,
+      Opportunity,
+      Interaction,
+      Purchase,
+      Reminder,
+      Project,
+      Appointment,
+    ]),
     ConfigModule, // Importa ConfigModule aquí
   ],
-  providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService, AppointmentService],
-  controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController, AppointmentController]
+  providers: [
+    CustomersService,
+    UsersService,
+    PurchaseService,
+    OportunityService,
+    InterationService,
+    RemiderService,
+    AppointmentService,
+  ],
+  controllers: [
+    CustomersController,
+    UsersController,
+    OportunityController,
+    InterationController,
+    PurchaseController,
+    RemiderController,
+    AppointmentController,
+  ],
 })
 export class CustomersModule {}

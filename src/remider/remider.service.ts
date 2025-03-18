@@ -26,6 +26,22 @@ export class RemiderService {
         }
     }
 
+    async getAllReminderByNotification() {
+        const reminders = await this.reminderRepository.find({
+            relations: ['customer', 'customer.user'], // Incluye la relación 'user' dentro de 'customer'
+        });
+    
+        return {
+            reminders: reminders.map(reminder => ({
+                ...reminder,
+                customer: {
+                    ...reminder.customer,
+                    user: reminder.customer?.user, // Asegura que el usuario se incluya en la respuesta
+                },
+            })),
+        };
+    }
+    
     async closeReminder(closeReminder: CloseReminderDto) {
         const reminder = await this.reminderRepository.findOneBy(
             {

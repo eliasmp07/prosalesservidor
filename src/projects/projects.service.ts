@@ -11,32 +11,34 @@ import { DeleteProjectDto } from './dto/delete_project.dto';
 
 @Injectable()
 export class ProjectsService {
-
   constructor(
     @InjectRepository(Project) private projectRepository: Repository<Project>,
-    @InjectRepository(Customer) private customerRepository: Repository<Customer>,
-    @InjectRepository(ProjectCancellation) private cancellRepository: Repository<ProjectCancellation>,
-    @InjectRepository(Purchase) private purchaseRepository: Repository<Purchase>,
-  ){
+    @InjectRepository(Customer)
+    private customerRepository: Repository<Customer>,
+    @InjectRepository(ProjectCancellation)
+    private cancellRepository: Repository<ProjectCancellation>,
+    @InjectRepository(Purchase)
+    private purchaseRepository: Repository<Purchase>,
+  ) {}
 
-  }
-
-  async completeProject(projectId: number){
-    const project = await this.projectRepository.findOne({ where: { id: projectId }, relations: ['customer', 'products'], });
-    console.log(project)
+  async completeProject(projectId: number) {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: ['customer', 'products'],
+    });
+    console.log(project);
     project.status = 'Cierre';
-    project.progress = 100.00;
-    const newProject =  await this.projectRepository.save(project);
+    project.progress = 100.0;
+    const newProject = await this.projectRepository.save(project);
     return newProject;
   }
-
 
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     // Buscar el cliente por su ID
     const customer = await this.customerRepository.findOneBy({
-      customer_id: Number(createProjectDto.customerId)
+      customer_id: Number(createProjectDto.customerId),
     });
-    console.log(createProjectDto.valorProject)
+    console.log(createProjectDto.valorProject);
     // Crear el nuevo proyecto
     const newProject = this.projectRepository.create({
       nameProject: createProjectDto.nameProject,
@@ -54,7 +56,7 @@ export class ProjectsService {
     if (createProjectDto.purchases && createProjectDto.purchases.length > 0) {
       for (const updatePurchaseDto of createProjectDto.purchases) {
         const purchase = await this.purchaseRepository.findOneBy({
-          purchase_id: Number(updatePurchaseDto.purchaseId)
+          purchase_id: Number(updatePurchaseDto.purchaseId),
         });
         if (purchase) {
           // Actualizar el monto de la compra
@@ -71,11 +73,11 @@ export class ProjectsService {
 
     return newProject;
   }
-  async findAllByCustomerId(customerId: number){
+  async findAllByCustomerId(customerId: number) {
     const projects = await this.projectRepository.find({
       where: {
         customer: {
-          customer_id: customerId, 
+          customer_id: customerId,
         },
       },
       relations: ['customer', 'products'],
@@ -84,13 +86,13 @@ export class ProjectsService {
     return projects;
   }
 
-  async findAllByUserId(userId: number){
+  async findAllByUserId(userId: number) {
     const projects = await this.projectRepository.find({
       where: {
         customer: {
-          user : {
-            id: userId
-          }
+          user: {
+            id: userId,
+          },
         },
       },
       relations: ['customer', 'products'],
@@ -98,8 +100,13 @@ export class ProjectsService {
 
     return projects;
   }
-  async cancelProject(projectId: number, deleteProject: DeleteProjectDto): Promise<Project> {
-    const project = await this.projectRepository.findOne({ where: { id: projectId } });
+  async cancelProject(
+    projectId: number,
+    deleteProject: DeleteProjectDto,
+  ): Promise<Project> {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+    });
 
     // Crear registro de cancelación en la tabla auxiliar
     const cancellation = new ProjectCancellation();
@@ -114,14 +121,13 @@ export class ProjectsService {
     // Marcar el proyecto como cancelado
     project.isCancel = true;
     project.status = 'Perdido';
-    project.progress = 60.00;
+    project.progress = 60.0;
 
     // Guardar los cambios en el proyecto
     await this.projectRepository.save(project);
 
     return project;
-}
-
+  }
 
   findOne(id: number) {
     return `This action returns a #${id} project`;
@@ -131,7 +137,5 @@ export class ProjectsService {
     return `This action updates a #${id} project`;
   }
 
-  remove(id: number) {
-    
-  }
+  remove(id: number) {}
 }

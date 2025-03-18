@@ -4,6 +4,7 @@ import { RegisterUserDto } from './dto/register.user.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { resetPasswordDto } from './dto/reset-password.dto';
 import { MailService } from './service/MailService';
+import { alertReminderDto } from './dto/alert_reminder.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,5 +24,10 @@ export class AuthController {
     @Post('resetPassword')
     async resetPassword(@Body() resetPassword: resetPasswordDto){
         await this.mailService.sendPasswordResetEmail(resetPassword.email, resetPassword.email)
+    }
+
+    @Post('alert')
+    async alertMessage(@Body() alertReminderDto: alertReminderDto ){
+        await this.mailService.sendAlertEmail(alertReminderDto)
     }
 }

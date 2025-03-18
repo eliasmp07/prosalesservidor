@@ -79,13 +79,13 @@ export class AuthService {
               }
             }
 
-    await this.usersRepository.save(newUser); 
+    const userResponse = await this.usersRepository.save(newUser); 
 
     // Generar tokens
     const tokens = await this.getTokens(newUser.id.toString(), newUser.name); 
     await this.updateRefreshToken(newUser.id.toString(), tokens.refreshToken); // Esto actualizará el refreshToken en la base de datos
     
-    return tokens;
+    return userResponse;
     }
     
 

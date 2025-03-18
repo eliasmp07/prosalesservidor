@@ -21,12 +21,32 @@ import { RemiderService } from 'src/remider/remider.service';
 import { RemiderController } from 'src/remider/remider.controller';
 
 @Module({
-  imports:[
-    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder]),
+  imports: [
+    TypeOrmModule.forFeature([
+      Customer,
+      User,
+      Opportunity,
+      Interaction,
+      Purchase,
+      Reminder,
+    ]),
     ConfigModule, // Importa ConfigModule aquí
   ],
-  providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService],
-  controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController]
-
+  providers: [
+    CustomersService,
+    UsersService,
+    PurchaseService,
+    OportunityService,
+    InterationService,
+    RemiderService,
+  ],
+  controllers: [
+    CustomersController,
+    UsersController,
+    OportunityController,
+    InterationController,
+    PurchaseController,
+    RemiderController,
+  ],
 })
 export class OportunityModule {}

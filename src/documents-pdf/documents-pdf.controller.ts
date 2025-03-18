@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { DocumentsPdfService } from './documents-pdf.service';
 import { CreateDocumentsPdfDto } from './dto/create-documents-pdf.dto';
 import { UpdateDocumentsPdfDto } from './dto/update-documents-pdf.dto';
@@ -23,7 +31,10 @@ export class DocumentsPdfController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDocumentsPdfDto: UpdateDocumentsPdfDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateDocumentsPdfDto: UpdateDocumentsPdfDto,
+  ) {
     return this.documentsPdfService.update(+id, updateDocumentsPdfDto);
   }
 

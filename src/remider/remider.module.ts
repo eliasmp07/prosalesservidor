@@ -29,7 +29,8 @@ import { AppointmentController } from 'src/appointment/appointment.controller';
     ConfigModule, // Importa ConfigModule aquí
   ],
   providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService, AppointmentService],
-  controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController, AppointmentController]
+  controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController, AppointmentController],
+  exports: [RemiderService], 
 
 })
 export class RemiderModule {}

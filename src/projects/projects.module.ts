@@ -28,7 +28,14 @@ import { ProjectCancellation } from './entities/projectCancellation.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Project, Purchase, Customer, Opportunity, Interaction, Reminder, User, ProjectCancellation
+      Project,
+      Purchase,
+      Customer,
+      Opportunity,
+      Interaction,
+      Reminder,
+      User,
+      ProjectCancellation,
     ]),
     ConfigModule,
     PurchaseModule, // Importar el PurchaseModule aquí

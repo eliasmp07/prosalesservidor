@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -13,24 +21,27 @@ export class ProjectsController {
     return this.projectsService.create(createProjectDto);
   }
 
-  @Get("findProjectById/:id")
+  @Get('findProjectById/:id')
   findAll(@Param('id') id: number) {
     return this.projectsService.findAllByCustomerId(id);
   }
 
-  @Get("findProjectByUserId/:id")
+  @Get('findProjectByUserId/:id')
   findProjectByUserId(@Param('id') id: number) {
     return this.projectsService.findAllByUserId(id);
   }
 
-  @Post("closeProject/:id")
-  closeProject(@Param('id') id: number){
-    return this.projectsService.completeProject(id)
+  @Post('closeProject/:id')
+  closeProject(@Param('id') id: number) {
+    return this.projectsService.completeProject(id);
   }
 
   @Delete('delete/:id')
-  deleteProject(@Param('id') id: number, @Body() deleteProject: DeleteProjectDto){
-    this.projectsService.cancelProject(id, deleteProject)
+  deleteProject(
+    @Param('id') id: number,
+    @Body() deleteProject: DeleteProjectDto,
+  ) {
+    this.projectsService.cancelProject(id, deleteProject);
   }
 
   @Get(':id')

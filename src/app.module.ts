@@ -16,9 +16,13 @@ import { ProjectsModule } from './projects/projects.module';
 import { DocumentsPdfModule } from './documents-pdf/documents-pdf.module';
 import { BannersModule } from './banners/banners.module';
 import { AppointmentModule } from './appointment/appointment.module';
+import { TaskService } from './task/task.service';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MailService } from './auth/service/MailService';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.HOST_DB,
@@ -45,6 +49,6 @@ import { AppointmentModule } from './appointment/appointment.module';
     AppointmentModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TaskService, MailService],
 })
 export class AppModule {}
