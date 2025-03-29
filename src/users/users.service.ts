@@ -8,6 +8,7 @@ import storage = require('../utils/cloud_storage.js');
 import { Not, Like } from "typeorm";
 import { hash } from 'bcrypt';
 import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
+import { UpdateInfoUserDto } from './dto/update-info-user';
 @Injectable()
 export class UsersService {
   constructor(
@@ -151,6 +152,41 @@ async findAll() {
     const updatedUser = Object.assign(userFound, user);
     return this.usersRepository.save(updatedUser);
   }
+
+  async updateInfoUser(updateUserInfo: UpdateInfoUserDto){
+    const user = await this.usersRepository.findOneBy({ id: updateUserInfo.id });
+    if (!user) {
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+    }
+    
+  const hashedPassword = await hash(updateUserInfo.password, Number(process.env.HAST_SALT));
+  const isDifferencePassword = await hash(updateUserInfo.password, updateUserInfo.password);
+
+    if (isDifferencePassword) {
+      
+    }
+  }
+
+  async deleteUser(userId: number){
+    const userFound = await this.usersRepository.findOneBy({ id: userId });
+    if (!userFound) {
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+    }
+    userFound.isDelete = true
+    await this.usersRepository.save(userFound);
+  
+    return { message: 'Usuario elimininado' };}
+
+    
+  async activeUser(userId: number){
+    const userFound = await this.usersRepository.findOneBy({ id: userId });
+    if (!userFound) {
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+    }
+    userFound.isDelete = false
+    await this.usersRepository.save(userFound);
+  
+    return { message: 'Usuario elimininado' };}
 
 
 async updatePassword(userId: number, newPassword: string): Promise<{ message: string }> {
