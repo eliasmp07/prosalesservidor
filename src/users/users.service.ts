@@ -160,28 +160,6 @@ async findAll() {
 
   async updateInfoUser(updateUserInfo: UpdateInfoUserDto){
     console.log(updateUserInfo)
-    // 1️⃣ Verifica si el correo o teléfono ya están registrados en otro usuario
-  const userExist = await this.usersRepository.findOne({
-    where: [
-      { email: updateUserInfo.email, id: Not(updateUserInfo.id) }, // Verifica que el email no esté asociado a otro usuario
-      { phone: updateUserInfo.phone, id: Not(updateUserInfo.id) },  // Verifica que el teléfono no esté asociado a otro usuario
-    ],
-  });
-
-  if (userExist) {
-    if (userExist.email === updateUserInfo.email) {
-      throw new HttpException(
-        'El email ya está registrado',
-        HttpStatus.CONFLICT,
-      );
-    }
-    if (userExist.phone === updateUserInfo.phone) {
-      throw new HttpException(
-        'Ya hay un usuario con ese número de teléfono',
-        HttpStatus.CONFLICT,
-      );
-    }
-  }
 
   // 2️⃣ Actualiza los datos del usuario
   const existingUser = await this.usersRepository.findOne({ where: { id: updateUserInfo.id } });
