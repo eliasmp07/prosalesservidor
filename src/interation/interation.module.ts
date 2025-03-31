@@ -19,9 +19,13 @@ import { RemiderService } from 'src/remider/remider.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RemiderController } from 'src/remider/remider.controller';
+import { RolesModule } from 'src/roles/roles.module';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
 
 @Module({
   imports:[
+    RolesModule,
+    SucursalesModule,
     TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder]),
     ConfigModule, // Importa ConfigModule aquí
   ],

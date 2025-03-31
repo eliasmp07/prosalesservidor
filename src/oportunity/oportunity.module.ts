@@ -19,9 +19,14 @@ import { CustomersController } from 'src/customers/customers.controller';
 import { Reminder } from 'src/remider/entity/remider.entity';
 import { RemiderService } from 'src/remider/remider.service';
 import { RemiderController } from 'src/remider/remider.controller';
+import { RolesModule } from 'src/roles/roles.module';
+import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
 
 @Module({
   imports: [
+    RolesModule,
+    SucursalesModule,
     TypeOrmModule.forFeature([
       Customer,
       User,

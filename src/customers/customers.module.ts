@@ -23,9 +23,13 @@ import { Project } from 'src/projects/entities/project.entity';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { AppointmentService } from 'src/appointment/appointment.service';
 import { AppointmentController } from 'src/appointment/appointment.controller';
+import { RolesModule } from 'src/roles/roles.module';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
 
 @Module({
   imports: [
+    RolesModule,
+    SucursalesModule,
     TypeOrmModule.forFeature([
       Customer,
       User,

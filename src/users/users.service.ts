@@ -1,17 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { compare } from 'bcrypt';
 import storage = require('../utils/cloud_storage.js');
 import { Not, Like } from "typeorm";
 import { hash } from 'bcrypt';
 import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 import { UpdateInfoUserDto } from './dto/update-info-user';
+import { Rol } from 'src/roles/rol.entity';
 @Injectable()
 export class UsersService {
   constructor(
+    @InjectRepository(Rol) private rolesRepository: Repository<Rol>,
+        @InjectRepository(Sucursales)
+        private sucusalesRepository: Repository<Sucursales>,
     @InjectRepository(User) private usersRepository: Repository<User>
   ) {}
 
@@ -154,17 +159,86 @@ async findAll() {
   }
 
   async updateInfoUser(updateUserInfo: UpdateInfoUserDto){
-    const user = await this.usersRepository.findOneBy({ id: updateUserInfo.id });
-    if (!user) {
-      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
-    }
-    
-  const hashedPassword = await hash(updateUserInfo.password, Number(process.env.HAST_SALT));
-  const isDifferencePassword = await hash(updateUserInfo.password, updateUserInfo.password);
+    console.log(updateUserInfo)
+    // 1️⃣ Verifica si el correo o teléfono ya están registrados en otro usuario
+  const userExist = await this.usersRepository.findOne({
+    where: [
+      { email: updateUserInfo.email, id: Not(updateUserInfo.id) }, // Verifica que el email no esté asociado a otro usuario
+      { phone: updateUserInfo.phone, id: Not(updateUserInfo.id) },  // Verifica que el teléfono no esté asociado a otro usuario
+    ],
+  });
 
-    if (isDifferencePassword) {
-      
+  if (userExist) {
+    if (userExist.email === updateUserInfo.email) {
+      throw new HttpException(
+        'El email ya está registrado',
+        HttpStatus.CONFLICT,
+      );
     }
+    if (userExist.phone === updateUserInfo.phone) {
+      throw new HttpException(
+        'Ya hay un usuario con ese número de teléfono',
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+
+  // 2️⃣ Actualiza los datos del usuario
+  const existingUser = await this.usersRepository.findOne({ where: { id: updateUserInfo.id } });
+
+  if (!existingUser) {
+    throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+  }
+
+
+  if (updateUserInfo.password.length > 0) {
+      // 2. Hashear la nueva contraseña
+   const hashedPassword = await hash(updateUserInfo.password, Number(process.env.HAST_SALT));
+
+   // 3. Actualizar la contraseña
+   existingUser.password = hashedPassword;
+  }
+
+  // Actualiza los valores del usuario
+  existingUser.name = updateUserInfo.name || existingUser.name;
+  existingUser.lastname = updateUserInfo.lastname || existingUser.lastname;
+  existingUser.email = updateUserInfo.email || existingUser.email;
+  existingUser.phone = updateUserInfo.phone || existingUser.phone;
+  existingUser.puesto = updateUserInfo.puesto || existingUser.puesto;
+
+  // 3️⃣ Actualiza las sucursales del usuario
+  let sucursalIds =
+  updateUserInfo.sucusalIds && updateUserInfo.sucusalIds.length > 0 ? updateUserInfo.sucusalIds : ['Propapel Merida'];
+
+  const sucursales = await this.sucusalesRepository.find({
+    where: { id: In(sucursalIds) },
+  });
+
+  existingUser.sucursales = sucursales; // Asigna las sucursales al usuario
+
+  // 4️⃣ Actualiza los roles del usuario
+  let rolesIds =
+  updateUserInfo.rolesIds && updateUserInfo.rolesIds.length > 0 ? updateUserInfo.rolesIds : ['Ejecutivo de ventas'];
+
+  const roles = await this.rolesRepository.find({
+    where: { id: In(rolesIds) },
+  });
+
+  existingUser.roles = roles; // Asigna los roles al usuario
+
+  // 5️⃣ Si se proporciona una nueva imagen, la guarda
+  if (updateUserInfo.image != existingUser.image) {
+    const buffer = Buffer.from(updateUserInfo.image, 'base64');
+    const pathImage = `profilePhoto_${Date.now()}`;
+    const imageUrl = await storage(buffer, pathImage);
+
+    if (imageUrl) {
+      existingUser.image = imageUrl; // Actualiza la URL de la imagen
+    }
+  }
+
+  // 6️⃣ Guarda el usuario actualizado en la base de datos
+  const updatedUser = await this.usersRepository.save(existingUser);
   }
 
   async deleteUser(userId: number){

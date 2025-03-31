@@ -16,9 +16,13 @@ import { Purchase } from 'src/purchase/entity/purchase.entity';
 import { Opportunity } from 'src/oportunity/entity/oportunity.entity';
 import { Reminder } from 'src/remider/entity/remider.entity';
 import { Interaction } from 'src/interation/entity/interation.entity';
+import { RolesModule } from 'src/roles/roles.module';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
 
 @Module({
   imports:[
+    SucursalesModule,
+    RolesModule,
     TypeOrmModule.forFeature([User, Customer, Purchase, Opportunity, Reminder, Interaction]),
     ConfigModule, // Importa ConfigModule aquí,
   ],

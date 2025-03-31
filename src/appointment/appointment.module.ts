@@ -22,9 +22,13 @@ import { Purchase } from 'src/purchase/entity/purchase.entity';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { UsersController } from 'src/users/users.controller';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports: [
+     RolesModule,
+        SucursalesModule,
     TypeOrmModule.forFeature([
       Customer, Appointment, Reminder, Opportunity, Interaction, Purchase, User
     ]),

@@ -22,9 +22,13 @@ import { CustomersController } from 'src/customers/customers.controller';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { AppointmentService } from 'src/appointment/appointment.service';
 import { AppointmentController } from 'src/appointment/appointment.controller';
+import { RolesModule } from 'src/roles/roles.module';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
 
 @Module({
   imports:[
+    RolesModule, 
+    SucursalesModule,
     TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder, Appointment]),
     ConfigModule, // Importa ConfigModule aquí
   ],

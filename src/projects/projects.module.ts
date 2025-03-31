@@ -24,9 +24,13 @@ import { UsersController } from 'src/users/users.controller';
 import { ConfigModule } from '@nestjs/config';
 import { PurchaseModule } from 'src/purchase/purchase.module';
 import { ProjectCancellation } from './entities/projectCancellation.entity';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports: [
+    RolesModule,
+    SucursalesModule,
     TypeOrmModule.forFeature([
       Project,
       Purchase,

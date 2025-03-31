@@ -20,15 +20,39 @@ import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { UsersController } from 'src/users/users.controller';
 import { Project } from 'src/projects/entities/project.entity';
+import { RolesModule } from 'src/roles/roles.module';
+import { SucursalesModule } from 'src/sucursales/sucursales.module';
 
 @Module({
-  imports:[
+  imports: [
+    RolesModule,
+    SucursalesModule,
     TypeOrmModule.forFeature([
-      Purchase, Customer, Opportunity, Interaction, Reminder, User, Project
+      Purchase,
+      Customer,
+      Opportunity,
+      Interaction,
+      Reminder,
+      User,
+      Project,
     ]),
     ConfigModule,
   ],
-  providers: [PurchaseService, CustomersService, OportunityService, InterationService, RemiderService, UsersService],
-  controllers: [PurchaseController, CustomersController, OportunityController, InterationController, RemiderController, UsersController],
+  providers: [
+    PurchaseService,
+    CustomersService,
+    OportunityService,
+    InterationService,
+    RemiderService,
+    UsersService,
+  ],
+  controllers: [
+    PurchaseController,
+    CustomersController,
+    OportunityController,
+    InterationController,
+    RemiderController,
+    UsersController,
+  ],
 })
 export class PurchaseModule {}

@@ -11,5 +11,6 @@ import { ConfigModule } from '@nestjs/config';
     TypeOrmModule.forFeature([Sucursales])],
   controllers: [SucursalesController],
   providers: [SucursalesService],
+  exports: [TypeOrmModule, SucursalesService],
 })
 export class SucursalesModule {}
