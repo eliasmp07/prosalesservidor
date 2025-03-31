@@ -78,7 +78,7 @@ export class AuthService {
     newUser.roles = roles; // Asigna los roles al usuario
 
     // 5️⃣ Guarda la imagen si está en base64
-    if (user.image) {
+    if (user.image && user.image.trim() !== "") {
       const buffer = Buffer.from(user.image, 'base64');
       const pathImage = `profilePhoto_${Date.now()}`;
       const imageUrl = await storage(buffer, pathImage);
