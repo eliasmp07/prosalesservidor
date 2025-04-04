@@ -30,6 +30,9 @@ async findAllUserBySucursale(sucursalId: number){
   const users = await this.usersRepository.find({
     where: {
       sucursales: { id: sucursalId },
+      roles: {
+         id : Like('1')
+      },
       email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
     },
     relations: [
