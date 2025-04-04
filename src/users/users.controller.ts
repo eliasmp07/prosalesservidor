@@ -49,7 +49,7 @@ export class UsersController {
 
   @Get('getUserBySucursal/:sucursalId')
   findUserBySucursal(@Param('sucursalId', ParseIntPipe) id: number) {
-    return this.usersService.findUserBySucursalId(id);
+    return this.usersService.findAllUserBySucursale(id)
   }
 
   @Get('getUserById/:Id')

@@ -25,23 +25,25 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
-async findUserBySucursalId(sucursalId: number) { 
-    const users = await this.usersRepository.find({
-        where: {
-            sucursales: { id: sucursalId },
-            email: Like('%@propapel.com.mx') // Filtrar solo correos que terminen en @propapel.com.mx
-        },
-        relations: [
-            'sucursales',
-            'roles',
-            'customers',
-            'customers.interactions',
-            'customers.purchases',
-            'customers.reminders',
-            'customers.projects'
-        ]
-    });
-    return { users };
+
+async findAllUserBySucursale(sucursalId: number){
+  const users = await this.usersRepository.find({
+    where: {
+      sucursales: { id: sucursalId },
+      email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
+    },
+    relations: [
+      'sucursales',
+      'roles',
+      'customers',
+      'customers.interactions',
+      'customers.purchases',
+      'customers.reminders',
+      'customers.projects'
+    ]
+  });
+
+  return { users };
 }
 
 async findAllUsers(){

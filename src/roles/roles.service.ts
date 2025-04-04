@@ -21,4 +21,15 @@ export class RolesService {
         };
     }
 
+    async getRolesExecutive(){
+        const rolesFound = await this.rolesRepository.find({
+            where : {
+                id: "1"
+            }
+        })
+        return {
+            roles: rolesFound
+        }
+    }
+
 }

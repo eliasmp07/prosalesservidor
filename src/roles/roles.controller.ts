@@ -16,4 +16,9 @@ export class RolesController {
         return this.rolesService.getAllRoles()
     }
 
+    @Get("getRolesExecutive")
+    getRolesExecutive(){
+        return this.rolesService.getRolesExecutive()
+    }
+
 }
