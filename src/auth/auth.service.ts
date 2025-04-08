@@ -115,6 +115,10 @@ export class AuthService {
       throw new HttpException('El email no existe', HttpStatus.NOT_FOUND);
     }
 
+    if(userFound.isDelete){
+      throw new HttpException('El email no existe', HttpStatus.NOT_FOUND);
+    }
+
     const isPasswordValid = await compare(password, userFound.password);
 
     if (!isPasswordValid) {
