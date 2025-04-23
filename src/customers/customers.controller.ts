@@ -15,6 +15,11 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 export class CustomersController {
   constructor(private customerService: CustomersService) {}
 
+  @Post('createLead')
+  createLead(@Body() customer: CreateCustomerDto) {
+    this.customerService.createNewVersion(customer);
+  }
+
   @Post('create')
   create(@Body() customer: CreateCustomerDto) {
     this.customerService.create(customer);

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -21,6 +22,11 @@ export class ProjectsController {
     return this.projectsService.create(createProjectDto);
   }
 
+  @Put('update')
+  updateProject(){
+
+  }
+  
   @Get('findProjectById/:id')
   findAll(@Param('id') id: number) {
     return this.projectsService.findAllByCustomerId(id);

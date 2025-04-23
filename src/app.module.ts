@@ -19,6 +19,7 @@ import { AppointmentModule } from './appointment/appointment.module';
 import { TaskService } from './task/task.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './auth/service/MailService';
+import { ActivityModule } from './activity/activity.module';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { MailService } from './auth/service/MailService';
     ProjectsModule,
     DocumentsPdfModule,
     BannersModule,
-    AppointmentModule
+    AppointmentModule,
+    ActivityModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskService, MailService],

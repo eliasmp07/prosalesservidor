@@ -100,6 +100,27 @@ export class ProjectsService {
 
     return projects;
   }
+
+  async updateProject(updateProject: UpdateProjectDto) {
+    const project = await this.projectRepository.findOneBy({
+      id: updateProject.id,
+    });
+  
+    if (!project) {
+      throw new Error('Project not found');
+    }
+  
+    // Actualiza los campos necesarios
+    project.nameProject = updateProject.nameProject;
+    project.prioridad = updateProject.prioridad;
+    project.valorProject = updateProject.valorProject;
+  
+    // Guarda los cambios
+    const updatedProject = await this.projectRepository.save(project);
+    return updatedProject;
+  }
+  
+
   async cancelProject(
     projectId: number,
     deleteProject: DeleteProjectDto,

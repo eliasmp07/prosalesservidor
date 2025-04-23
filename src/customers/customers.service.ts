@@ -93,6 +93,52 @@ export class CustomersService {
     return customer;
   }
 
+  async createNewVersion(createCustomerDto: CreateCustomerDto): Promise<Customer> {
+    const {
+      opportunities,
+      interactions,
+      purchases,
+      reminders,
+      ...customerData
+    } = createCustomerDto;
+
+    const user = await this.userRepository.findOne({
+      where: { id: createCustomerDto.idUser },
+    });
+
+    // Crear el cliente
+    const customer = this.customersRepository.create(customerData);
+    customer.user = user;
+
+    await this.customersRepository.save(customer);
+
+    // Crear las oportunidades relacionadas (si se proporcionaron)
+
+    // Crear las compras relacionadas (si se proporcionaron)
+    if (purchases) {
+      const purchaseEntities = purchases.map((purchaseDto) => {
+        return this.purchasesRepository.create({
+          ...purchaseDto,
+          customer,
+        });
+      });
+      await this.purchasesRepository.save(purchaseEntities);
+    }
+
+    // Crear los recordatorios relacionados (si se proporcionaron)
+    if (reminders) {
+      const reminderEntities = reminders.map((reminderDto) => {
+        return this.remindersRepository.create({
+          ...reminderDto,
+          customer,
+        });
+      });
+      await this.remindersRepository.save(reminderEntities);
+    }
+
+    return customer;
+  }
+
   async getCustomerById(customerId: number) {
     const customer = await this.customersRepository.findOne({
       relations: ['opportunities', 'interactions', 'purchases', 'reminders'],

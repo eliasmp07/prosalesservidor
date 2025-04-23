@@ -17,7 +17,7 @@ const bucket = storage.bucket("gs://prosales-c49e5.appspot.com/");
  * Subir el archivo a Firebase Storage
  * file objeto que sera almacenado en Firebase Storage
  */
-module.exports = (buffer, pathImage,) => {
+module.exports = (buffer, pathImage, contentType = 'image/png') => {
     return new Promise((resolve, reject) => {
         
         if (pathImage) {
@@ -25,7 +25,7 @@ module.exports = (buffer, pathImage,) => {
                 let fileUpload = bucket.file(`${pathImage}`);
                 const blobStream = fileUpload.createWriteStream({
                     metadata: {
-                        contentType: 'image/png',
+                        contentType: contentType,
                         metadata: {
                             firebaseStorageDownloadTokens: uuid,
                         }

@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, AfterLoad, BeforeInsert } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+  AfterLoad,
+  BeforeInsert,
+} from 'typeorm';
 import { Opportunity } from '../../oportunity/entity/oportunity.entity';
 import { Interaction } from '../../interation/entity/interation.entity';
 import { Purchase } from '../../purchase/entity/purchase.entity';
@@ -6,6 +14,7 @@ import { Reminder } from '../../remider/entity/remider.entity';
 import { User } from 'src/users/user.entity';
 import { Project } from 'src/projects/entities/project.entity';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
+import { Activity } from 'src/activity/entities/activity.entity';
 
 @Entity('customers')
 export class Customer {
@@ -27,10 +36,10 @@ export class Customer {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   progressLead: number;
 
-  @ManyToOne(() => User, user => user.customers,{ eager: true })
+  @ManyToOne(() => User, (user) => user.customers, { eager: true })
   user: User;
 
-  @OneToMany(() => Project, project => project.customer, { eager: true })
+  @OneToMany(() => Project, (project) => project.customer, { eager: true })
   projects: Project[];
 
   @Column({ nullable: true })
@@ -39,23 +48,27 @@ export class Customer {
   @Column()
   type_of_client: string;
 
-  @OneToMany(() => Opportunity, opportunity => opportunity.customer)
+  @OneToMany(() => Opportunity, (opportunity) => opportunity.customer)
   opportunities: Opportunity[];
 
-  @OneToMany(() => Interaction, interaction => interaction.customer)
+  @OneToMany(() => Interaction, (interaction) => interaction.customer)
   interactions: Interaction[];
 
-  @OneToMany(() => Purchase, purchase => purchase.customer)
+  @OneToMany(() => Purchase, (purchase) => purchase.customer)
   purchases: Purchase[];
 
-  @OneToMany(() => Reminder, reminder => reminder.customer)
+  @OneToMany(() => Reminder, (reminder) => reminder.customer)
   reminders: Reminder[];
-  
+
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  // Relación con las actividades del cliente
+  @OneToMany(() => Activity, (activity) => activity.customer) // Relación inversa con Activity
+  activities: Activity[];
 
   /**
    * Método explícito para calcular el progreso.
@@ -63,21 +76,21 @@ export class Customer {
   calculateProgress(userId: number) {
     if (userId == this.user.id) {
       let progress = 10.0;
-  
+
       if (this.interactions && this.interactions.length > 0) {
         progress += 15.0;
       }
-  
+
       if (this.purchases && this.purchases.length > 0) {
         progress += 15.0;
       }
-  
+
       if (this.projects && this.projects.length > 0) {
         progress += 20.0;
-  
+
         let hasCierre = false;
         let allPerdido = true;
-  
+
         this.projects.forEach((project) => {
           if (project.status === 'Cierre') {
             hasCierre = true;
@@ -85,7 +98,7 @@ export class Customer {
             allPerdido = false;
           }
         });
-  
+
         if (hasCierre) {
           progress = 100.0; // Si al menos un proyecto tiene "Cierre", la suma es 100.
         } else if (allPerdido) {
@@ -95,13 +108,12 @@ export class Customer {
           this.projects.forEach((project) => {
             if (project.status === 'En negociacion') {
               progress = 90;
-            } 
+            }
           });
         }
       }
-  
+
       this.progressLead = Math.min(progress, 100.0); // Asegurarse de que no supere 100.
     }
   }
-  
 }
