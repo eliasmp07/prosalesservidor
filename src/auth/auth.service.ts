@@ -26,6 +26,7 @@ export class AuthService {
   ) {}
 
   async register(user: RegisterUserDto) {
+  
     // 1️⃣ Verifica si el correo o teléfono ya existen
     const emailExist = await this.usersRepository.findOne({
       where: { email: user.email },
@@ -81,7 +82,7 @@ export class AuthService {
     if (user.image && user.image.trim() !== "") {
       const buffer = Buffer.from(user.image, 'base64');
       const pathImage = `profilePhoto_${Date.now()}`;
-      const imageUrl = await storage(buffer, pathImage);
+      const imageUrl = await storage(buffer, pathImage, 'image/png');
 
       if (imageUrl) {
         newUser.image = imageUrl; // Guarda la URL de la imagen
