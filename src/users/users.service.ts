@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { compare } from 'bcrypt';
 import storage = require('../utils/cloud_storage.js');
-import { Not, Like } from "typeorm";
+import { Not, Like } from 'typeorm';
 import { hash } from 'bcrypt';
 import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 import { UpdateInfoUserDto } from './dto/update-info-user';
@@ -15,9 +15,9 @@ import { Rol } from 'src/roles/rol.entity';
 export class UsersService {
   constructor(
     @InjectRepository(Rol) private rolesRepository: Repository<Rol>,
-        @InjectRepository(Sucursales)
-        private sucusalesRepository: Repository<Sucursales>,
-    @InjectRepository(User) private usersRepository: Repository<User>
+    @InjectRepository(Sucursales)
+    private sucusalesRepository: Repository<Sucursales>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
   create(user: CreateUserDto) {
@@ -25,55 +25,20 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
-
-async findAllUserBySucursale(sucursalId: number){
-  const users = await this.usersRepository.find({
-    where: {
-      sucursales: { id: sucursalId },
-      roles: {
-         id : Like('1')
-      },
-      email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
-    },
-    relations: [
-      'sucursales',
-      'roles',
-      'customers',
-      'customers.interactions',
-      'customers.purchases',
-      'customers.reminders',
-      'customers.projects'
-    ]
-  });
-
-  return { users };
-}
-
-async findAllUsers(){
-  const users = await this.usersRepository.find({
-    where: {
-      email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
-    },
-    relations: [
-      'sucursales',
-      'roles',
-      'customers',
-      'customers.interactions',
-      'customers.purchases',
-      'customers.reminders',
-      'customers.projects'
-    ]
-  });
-
-  return { users };
-}
-
-async getUserById(id: number){
-  const user = await this.usersRepository.findOne({ 
-      where: {
-        id: id,
-        email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
-      },
+  async findAllUserBySucursale(sucursalId: number) {
+    const users = await this.usersRepository.find({
+      where: [
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('1') },
+          email: Like('%@propapel.com.mx'),
+        },
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('1') },
+          email: Like('%@optivosa.com'),
+        },
+      ],
       relations: [
         'sucursales',
         'roles',
@@ -81,75 +46,128 @@ async getUserById(id: number){
         'customers.interactions',
         'customers.purchases',
         'customers.reminders',
-        'customers.projects'
-      ]
-  });
-  return user;
-}
-
-async getAllUserBySucursales(){
-  const users = await this.usersRepository.find({
-    where: {
-      email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
-    },
-    relations: [
-      'sucursales',
-      'roles',
-      'customers',
-      'customers.interactions',
-      'customers.purchases',
-      'customers.reminders',
-      'customers.projects'
-    ]
-  });
-}
-
-async findUserBySucursale() {
-    const usersFound = await this.usersRepository.find({
-        where: {
-            email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
-        },
-        relations: [ 
-          'sucursales',
-          'roles',
-          'customers',
-          'customers.interactions',
-          'customers.purchases',
-          'customers.reminders',
-          'customers.projects'
-        ]
+        'customers.projects',
+      ],
     });
 
-    const merida = "Propapel Merida";
-    const mty = "Propapel Monterrey";
-    const mexico = "Propapel Mexico";
+    return { users };
+  }
 
-    // Filtrar los usuarios por sucursal
-    const usersBySucursal = {
-        merida: usersFound.filter(user => user.sucursales.some(sucursal => sucursal.nombre === merida)),
-        monterrey: usersFound.filter(user => user.sucursales.some(sucursal => sucursal.nombre === mty)),
-        mexico: usersFound.filter(user => user.sucursales.some(sucursal => sucursal.nombre === mexico)),
-    };
-
-    return usersBySucursal;
-}
-
-async findAll() {
+  async findAllUsers() {
     const users = await this.usersRepository.find({
-        where: {
-            email: Like('%@propapel.com.mx') // Filtrar solo correos válidos
-        }
+      where: [
+        { email: Like('%@optivosa.com') },
+        { email: Like('%@propapel.com.mx') },
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
     });
 
+    return { users };
+  }
+
+  async getUserById(id: number) {
+    const user = await this.usersRepository.findOne({
+      where: [
+        { id: id, email: Like('%@propapel.com.mx') },
+        { id: id, email: Like('%@optivosa.com') }
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+    return user;
+  }
+  
+
+  async getAllUserBySucursales() {
+    const users = await this.usersRepository.find({
+      where: [
+        { email: Like('%@propapel.com.mx') },
+        { email: Like('%@optivosa.com') }
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+    return users;
+  }
+  
+
+  async findUserBySucursale() {
+    const usersFound = await this.usersRepository.find({
+      where: [
+        { email: Like('%@propapel.com.mx') },
+        { email: Like('%@optivosa.com') }
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+  
+    const merida = 'Propapel Merida';
+    const mty = 'Propapel Monterrey';
+    const mexico = 'Propapel Mexico';
+  
+    const usersBySucursal = {
+      merida: usersFound.filter((user) =>
+        user.sucursales.some((sucursal) => sucursal.nombre === merida),
+      ),
+      monterrey: usersFound.filter((user) =>
+        user.sucursales.some((sucursal) => sucursal.nombre === mty),
+      ),
+      mexico: usersFound.filter((user) =>
+        user.sucursales.some((sucursal) => sucursal.nombre === mexico),
+      ),
+    };
+  
+    return usersBySucursal;
+  }
+  
+
+  async findAll() {
+    const users = await this.usersRepository.find({
+      where: [
+        { email: Like('%@propapel.com.mx') },
+        { email: Like('%@optivosa.com') }
+      ],
+    });
+  
     const data = users.map((user) => ({
       lastname: user.lastname,
       name: user.name,
       phone: user.phone,
       image: user.image,
     }));
-
+  
     return { users: data };
-}
+  }
+  
 
   async update(id: number, user: UpdateUserDto) {
     console.log('ID recibido:', id);
@@ -163,109 +181,122 @@ async findAll() {
     return this.usersRepository.save(updatedUser);
   }
 
-  async updateInfoUser(updateUserInfo: UpdateInfoUserDto){
-    console.log(updateUserInfo)
+  async updateInfoUser(updateUserInfo: UpdateInfoUserDto) {
+    console.log(updateUserInfo);
 
-  // 2️⃣ Actualiza los datos del usuario
-  const existingUser = await this.usersRepository.findOne({ where: { id: updateUserInfo.id } });
+    // 2️⃣ Actualiza los datos del usuario
+    const existingUser = await this.usersRepository.findOne({
+      where: { id: updateUserInfo.id },
+    });
 
-  if (!existingUser) {
-    throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
-  }
+    if (!existingUser) {
+      throw new HttpException('Usuario no encontrado', HttpStatus.NOT_FOUND);
+    }
 
-
-  if (updateUserInfo.password.length > 0) {
+    if (updateUserInfo.password.length > 0) {
       // 2. Hashear la nueva contraseña
-   const hashedPassword = await hash(updateUserInfo.password, Number(process.env.HAST_SALT));
+      const hashedPassword = await hash(
+        updateUserInfo.password,
+        Number(process.env.HAST_SALT),
+      );
 
-   // 3. Actualizar la contraseña
-   existingUser.password = hashedPassword;
-  }
-
-  // Actualiza los valores del usuario
-  existingUser.name = updateUserInfo.name || existingUser.name;
-  existingUser.lastname = updateUserInfo.lastname || existingUser.lastname;
-  existingUser.email = updateUserInfo.email || existingUser.email;
-  existingUser.phone = updateUserInfo.phone || existingUser.phone;
-  existingUser.puesto = updateUserInfo.puesto || existingUser.puesto;
-
-  // 3️⃣ Actualiza las sucursales del usuario
-  let sucursalIds =
-  updateUserInfo.sucusalIds && updateUserInfo.sucusalIds.length > 0 ? updateUserInfo.sucusalIds : ['Propapel Merida'];
-
-  const sucursales = await this.sucusalesRepository.find({
-    where: { id: In(sucursalIds) },
-  });
-
-  existingUser.sucursales = sucursales; // Asigna las sucursales al usuario
-
-  // 4️⃣ Actualiza los roles del usuario
-  let rolesIds =
-  updateUserInfo.rolesIds && updateUserInfo.rolesIds.length > 0 ? updateUserInfo.rolesIds : ['Ejecutivo de ventas'];
-
-  const roles = await this.rolesRepository.find({
-    where: { id: In(rolesIds) },
-  });
-
-  existingUser.roles = roles; // Asigna los roles al usuario
-
-  // 5️⃣ Si se proporciona una nueva imagen, la guarda
-  if (updateUserInfo.image != existingUser.image) {
-    const buffer = Buffer.from(updateUserInfo.image, 'base64');
-    const pathImage = `profilePhoto_${Date.now()}`;
-    const imageUrl = await storage(buffer, pathImage);
-
-    if (imageUrl) {
-      existingUser.image = imageUrl; // Actualiza la URL de la imagen
+      // 3. Actualizar la contraseña
+      existingUser.password = hashedPassword;
     }
+
+    // Actualiza los valores del usuario
+    existingUser.name = updateUserInfo.name || existingUser.name;
+    existingUser.lastname = updateUserInfo.lastname || existingUser.lastname;
+    existingUser.email = updateUserInfo.email || existingUser.email;
+    existingUser.phone = updateUserInfo.phone || existingUser.phone;
+    existingUser.puesto = updateUserInfo.puesto || existingUser.puesto;
+
+    // 3️⃣ Actualiza las sucursales del usuario
+    let sucursalIds =
+      updateUserInfo.sucusalIds && updateUserInfo.sucusalIds.length > 0
+        ? updateUserInfo.sucusalIds
+        : ['Propapel Merida'];
+
+    const sucursales = await this.sucusalesRepository.find({
+      where: { id: In(sucursalIds) },
+    });
+
+    existingUser.sucursales = sucursales; // Asigna las sucursales al usuario
+
+    // 4️⃣ Actualiza los roles del usuario
+    let rolesIds =
+      updateUserInfo.rolesIds && updateUserInfo.rolesIds.length > 0
+        ? updateUserInfo.rolesIds
+        : ['Ejecutivo de ventas'];
+
+    const roles = await this.rolesRepository.find({
+      where: { id: In(rolesIds) },
+    });
+
+    existingUser.roles = roles; // Asigna los roles al usuario
+
+    // 5️⃣ Si se proporciona una nueva imagen, la guarda
+    if (updateUserInfo.image != existingUser.image) {
+      const buffer = Buffer.from(updateUserInfo.image, 'base64');
+      const pathImage = `profilePhoto_${Date.now()}`;
+      const imageUrl = await storage(buffer, pathImage);
+
+      if (imageUrl) {
+        existingUser.image = imageUrl; // Actualiza la URL de la imagen
+      }
+    }
+
+    // 6️⃣ Guarda el usuario actualizado en la base de datos
+    const updatedUser = await this.usersRepository.save(existingUser);
   }
 
-  // 6️⃣ Guarda el usuario actualizado en la base de datos
-  const updatedUser = await this.usersRepository.save(existingUser);
-  }
-
-  async deleteUser(userId: number){
+  async deleteUser(userId: number) {
     const userFound = await this.usersRepository.findOneBy({ id: userId });
     if (!userFound) {
       throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
     }
-    userFound.isDelete = true
+    userFound.isDelete = true;
     await this.usersRepository.save(userFound);
-  
-    return { message: 'Usuario elimininado' };}
 
-    
-  async activeUser(userId: number){
+    return { message: 'Usuario elimininado' };
+  }
+
+  async activeUser(userId: number) {
     const userFound = await this.usersRepository.findOneBy({ id: userId });
     if (!userFound) {
       throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
     }
-    userFound.isDelete = false
+    userFound.isDelete = false;
     await this.usersRepository.save(userFound);
-  
-    return { message: 'Usuario elimininado' };}
 
-
-async updatePassword(userId: number, newPassword: string): Promise<{ message: string }> {
-  // 1. Buscar al usuario por su ID
-  const user = await this.usersRepository.findOneBy({ id: userId });
-  if (!user) {
-    throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+    return { message: 'Usuario elimininado' };
   }
 
-  // 2. Hashear la nueva contraseña
-  const hashedPassword = await hash(newPassword, Number(process.env.HAST_SALT));
+  async updatePassword(
+    userId: number,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    // 1. Buscar al usuario por su ID
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new HttpException('Usuario no existe', HttpStatus.NOT_FOUND);
+    }
 
-  // 3. Actualizar la contraseña
-  user.password = hashedPassword;
+    // 2. Hashear la nueva contraseña
+    const hashedPassword = await hash(
+      newPassword,
+      Number(process.env.HAST_SALT),
+    );
 
-  // 4. Guardar el usuario con la nueva contraseña
-  await this.usersRepository.save(user);
+    // 3. Actualizar la contraseña
+    user.password = hashedPassword;
 
-  // 5. Retornar un mensaje de confirmación
-  return { message: 'Contraseña actualizada correctamente' };}
+    // 4. Guardar el usuario con la nueva contraseña
+    await this.usersRepository.save(user);
 
-
+    // 5. Retornar un mensaje de confirmación
+    return { message: 'Contraseña actualizada correctamente' };
+  }
 
   async updateWithImage(id: number, user: UpdateUserDto) {
     const userFound = await this.usersRepository.findOneBy({ id: id });
@@ -299,7 +330,7 @@ async updatePassword(userId: number, newPassword: string): Promise<{ message: st
       phone: newUser.phone,
       image: user.image,
     };
-    console.log()
+    console.log();
     return data;
   }
 }
