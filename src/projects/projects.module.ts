@@ -26,6 +26,8 @@ import { PurchaseModule } from 'src/purchase/purchase.module';
 import { ProjectCancellation } from './entities/projectCancellation.entity';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
 import { RolesModule } from 'src/roles/roles.module';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { MailService } from 'src/auth/service/MailService';
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { RolesModule } from 'src/roles/roles.module';
       Reminder,
       User,
       ProjectCancellation,
+      LeadHistory
     ]),
     ConfigModule,
     PurchaseModule, // Importar el PurchaseModule aquí
@@ -59,6 +62,7 @@ import { RolesModule } from 'src/roles/roles.module';
     InterationService,
     RemiderService,
     UsersService,
+    MailService
   ],
 })
 export class ProjectsModule {}

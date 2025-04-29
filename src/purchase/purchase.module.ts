@@ -22,6 +22,8 @@ import { UsersController } from 'src/users/users.controller';
 import { Project } from 'src/projects/entities/project.entity';
 import { RolesModule } from 'src/roles/roles.module';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { MailService } from 'src/auth/service/MailService';
 
 @Module({
   imports: [
@@ -29,6 +31,7 @@ import { SucursalesModule } from 'src/sucursales/sucursales.module';
     SucursalesModule,
     TypeOrmModule.forFeature([
       Purchase,
+      LeadHistory,
       Customer,
       Opportunity,
       Interaction,
@@ -45,6 +48,8 @@ import { SucursalesModule } from 'src/sucursales/sucursales.module';
     InterationService,
     RemiderService,
     UsersService,
+    PurchaseModule,
+    MailService
   ],
   controllers: [
     PurchaseController,

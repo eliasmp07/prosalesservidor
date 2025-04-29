@@ -18,15 +18,17 @@ import { Reminder } from 'src/remider/entity/remider.entity';
 import { Interaction } from 'src/interation/entity/interation.entity';
 import { RolesModule } from 'src/roles/roles.module';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { MailService } from 'src/auth/service/MailService';
 
 @Module({
   imports:[
     SucursalesModule,
     RolesModule,
-    TypeOrmModule.forFeature([User, Customer, Purchase, Opportunity, Reminder, Interaction]),
+    TypeOrmModule.forFeature([User, Customer, Purchase, Opportunity, Reminder, Interaction, LeadHistory]),
     ConfigModule, // Importa ConfigModule aquí,
   ],
-  providers: [CustomersService, UsersService, AccessTokenStrategy, RefreshTokenStrategy, CustomersService, OportunityService, PurchaseService, RemiderService],
+  providers: [CustomersService, UsersService, AccessTokenStrategy, RefreshTokenStrategy, CustomersService, OportunityService, PurchaseService, RemiderService, MailService],
   controllers: [UsersController, CustomersController]
 })
 export class UsersModule {

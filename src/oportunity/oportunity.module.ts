@@ -22,6 +22,8 @@ import { RemiderController } from 'src/remider/remider.controller';
 import { RolesModule } from 'src/roles/roles.module';
 import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { MailService } from 'src/auth/service/MailService';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { SucursalesModule } from 'src/sucursales/sucursales.module';
       Interaction,
       Purchase,
       Reminder,
+      LeadHistory
     ]),
     ConfigModule, // Importa ConfigModule aquí
   ],
@@ -44,6 +47,7 @@ import { SucursalesModule } from 'src/sucursales/sucursales.module';
     OportunityService,
     InterationService,
     RemiderService,
+    MailService
   ],
   controllers: [
     CustomersController,

@@ -20,6 +20,7 @@ import { TaskService } from './task/task.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './auth/service/MailService';
 import { ActivityModule } from './activity/activity.module';
+import { LeadHistoryModule } from './lead-history/lead-history.module';
 
 @Module({
   imports: [
@@ -48,7 +49,8 @@ import { ActivityModule } from './activity/activity.module';
     DocumentsPdfModule,
     BannersModule,
     AppointmentModule,
-    ActivityModule
+    ActivityModule,
+    LeadHistoryModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskService, MailService],

@@ -6,6 +6,7 @@ import {
   ManyToOne,
   AfterLoad,
   BeforeInsert,
+  BeforeUpdate,
 } from 'typeorm';
 import { Opportunity } from '../../oportunity/entity/oportunity.entity';
 import { Interaction } from '../../interation/entity/interation.entity';
@@ -15,6 +16,9 @@ import { User } from 'src/users/user.entity';
 import { Project } from 'src/projects/entities/project.entity';
 import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
+import { ManagerReviewStatus } from 'src/enums/lead_manager_review';
+import { LeadStatus } from 'src/enums/lead_status';
+
 
 @Entity('customers')
 export class Customer {
@@ -35,6 +39,20 @@ export class Customer {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   progressLead: number;
+
+  @Column({
+    type: 'enum',
+    enum: LeadStatus,
+    default: LeadStatus.PROSPECT,
+  })
+  status: LeadStatus;
+
+  @Column({
+    type: 'enum',
+    enum: ManagerReviewStatus,
+    default: ManagerReviewStatus.PENDING,
+  })
+  managerReviewStatus: ManagerReviewStatus;
 
   @ManyToOne(() => User, (user) => user.customers, { eager: true })
   user: User;
@@ -72,22 +90,49 @@ export class Customer {
 
   /**
    * Método explícito para calcular el progreso.
-   */
-  calculateProgress(userId: number) {
-    if (userId == this.user.id) {
-      let progress = 10.0;
+   *  const funnelData = {
+      prospectos: customers.length,
+      contactados: customers.filter(
+        (c) => c.progressLead == 25,
+      ).length,
+      interesados: customers.filter(
+        (c) => c.progressLead == 40 || c.progressLead == 60,
+      ).length,
+      negociacion: customers.filter((c) =>
+       c.progressLead == 90, //c.projects.some((p) => p.status === 'En negociacion'),
+      ).length,
+      cerrados: customers.filter(
+        (c) =>
+          c.progressLead == 100,
+      ).length,
+    };
 
-      if (this.interactions && this.interactions.length > 0) {
+   */
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  updateProgress() {
+    if (this.user) { // Asegúrate que 'user' no sea undefined
+      this.calculateProgress(this.user.id);
+    }
+  }
+
+  calculateProgress(userId: number) {
+    if (userId === this.user.id) {
+      let progress = 10.0;
+      let detectedStatus = LeadStatus.PROSPECT;
+
+      if (this.reminders && this.reminders.length > 0) {
+        detectedStatus = LeadStatus.CONTACTED;
         progress += 15.0;
       }
 
       if (this.purchases && this.purchases.length > 0) {
+        detectedStatus = LeadStatus.INTERESTED;
         progress += 15.0;
       }
 
       if (this.projects && this.projects.length > 0) {
-        progress += 20.0;
-
         let hasCierre = false;
         let allPerdido = true;
 
@@ -100,20 +145,26 @@ export class Customer {
         });
 
         if (hasCierre) {
-          progress = 100.0; // Si al menos un proyecto tiene "Cierre", la suma es 100.
+          detectedStatus = LeadStatus.CLIENT;
+          progress = 100.0;
         } else if (allPerdido) {
-          progress = 40.0; // Si todos tienen "Perdido", la suma es 40.
+          detectedStatus = LeadStatus.NEGOTIATION;
+          progress = 40.0;
         } else {
-          // Cálculo original si no aplica ninguna de las reglas anteriores.
-          this.projects.forEach((project) => {
-            if (project.status === 'En negociacion') {
-              progress = 90;
-            }
-          });
+          const hasNegotiation = this.projects.some(
+            (project) => project.status === 'En negociacion'
+          );
+
+          if (hasNegotiation) {
+            detectedStatus = LeadStatus.NEGOTIATION;
+            progress = 90.0;
+          }
         }
       }
 
-      this.progressLead = Math.min(progress, 100.0); // Asegurarse de que no supere 100.
+      this.status = detectedStatus;
+      this.progressLead = Math.min(progress, 100.0);
     }
   }
 }
+

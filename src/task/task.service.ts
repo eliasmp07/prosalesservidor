@@ -55,6 +55,7 @@ export class TaskService {
     console.log('Aquí se enviará el correo de notificación');
   }
 
+ /*
   // Cron job para enviar recordatorio un día antes de la cita
   @Cron(CronExpression.EVERY_DAY_AT_9AM, {
     name: 'citas un dia antes',
@@ -97,9 +98,7 @@ export class TaskService {
       'Aquí se enviará el correo de recordatorio para el día siguiente',
     );
   }
-
-  // Cron job para enviar recordatorio una hora antes de la cita
-  @Cron(CronExpression.EVERY_HOUR, {
+    @Cron(CronExpression.EVERY_HOUR, {
     name: 'citas antes de una hora',
     timeZone: 'America/Mexico_City',
   }) // Cada hora, verificar si la cita es en una hora
@@ -141,4 +140,7 @@ export class TaskService {
       'Aquí se enviará el correo de recordatorio para una hora antes',
     );
   }
+*/
+  // Cron job para enviar recordatorio una hora antes de la cita
+  
 }

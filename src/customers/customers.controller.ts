@@ -5,11 +5,13 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { UpdateStatusCustomerDto } from './dto/update_status_customer.dto';
 
 @Controller('customers')
 export class CustomersController {
@@ -20,6 +22,11 @@ export class CustomersController {
     this.customerService.createNewVersion(customer);
   }
 
+  @Put('updateStatusManager')
+  updateStatusManager(@Body() updateStatusCustomerDto: UpdateStatusCustomerDto){
+     return this.customerService.updateStatusLead(updateStatusCustomerDto)
+  }
+  
   @Post('create')
   create(@Body() customer: CreateCustomerDto) {
     this.customerService.create(customer);

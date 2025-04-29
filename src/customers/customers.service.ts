@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from './entity/customer.entity';
 import { Like, Repository } from 'typeorm';
@@ -9,10 +9,18 @@ import { Purchase } from 'src/purchase/entity/purchase.entity';
 import { Interaction } from 'src/interation/entity/interation.entity';
 import { Opportunity } from 'src/oportunity/entity/oportunity.entity';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { LeadAction } from 'src/enums/lead-action';
+import { UpdateStatusCustomerDto } from './dto/update_status_customer.dto';
+import { LeadStatus } from 'src/enums/lead_status';
+import { ManagerReviewStatus } from 'src/enums/lead_manager_review';
+import { MailService } from 'src/auth/service/MailService';
+import { NotifityAlertAssignedCustomer } from 'src/auth/service/notifityAlertAssignedCustomer.dto';
 
 @Injectable()
 export class CustomersService {
   constructor(
+    private mailService: MailService,
     @InjectRepository(Customer)
     private customersRepository: Repository<Customer>,
     @InjectRepository(Opportunity)
@@ -24,6 +32,8 @@ export class CustomersService {
     @InjectRepository(Reminder)
     private remindersRepository: Repository<Reminder>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(LeadHistory)
+    private leadHistoryRepository: Repository<LeadHistory>,
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
@@ -93,7 +103,9 @@ export class CustomersService {
     return customer;
   }
 
-  async createNewVersion(createCustomerDto: CreateCustomerDto): Promise<Customer> {
+  async createNewVersion(
+    createCustomerDto: CreateCustomerDto,
+  ): Promise<Customer> {
     const {
       opportunities,
       interactions,
@@ -135,6 +147,12 @@ export class CustomersService {
       });
       await this.remindersRepository.save(reminderEntities);
     }
+
+    await this.leadHistoryRepository.save({
+      customerId: customer.customer_id,
+      action: LeadAction.CREATED,
+      performedById: user.id,
+    });
 
     return customer;
   }
@@ -217,13 +235,97 @@ export class CustomersService {
     return categorizedLeads;
 }
 */
-  async getFunnerCharByBrach(branch: string){
+  async updateStatusLead(updateStatusCustomerDto: UpdateStatusCustomerDto) {
+    const { customerId, status, userId, managerId } = updateStatusCustomerDto;
+
+    const customerFound = await this.customersRepository.findOne({
+      where: { customer_id: customerId },
+    });
+
+    let userAnteriorAssing = null;
+
+    if (updateStatusCustomerDto.userId != null) {
+      userAnteriorAssing = customerFound.user.id;
+    }
+
+    if (!customerFound) {
+      throw new HttpException('Nose encontro el cliente', HttpStatus.NOT_FOUND);
+    }
+
+    customerFound.managerReviewStatus =
+      ManagerReviewStatus[status as keyof typeof ManagerReviewStatus];
+
+    if (userId != null) {
+      const userAssigned = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!userAssigned) {
+        throw new HttpException(
+          'Nose encontro el usuario',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      customerFound.user = userAssigned;
+    }
+
+    await this.customersRepository.save(customerFound); // Guardar cambios en el cliente
+
+    let leadAction: LeadAction;
+
+    switch (ManagerReviewStatus[status as keyof typeof ManagerReviewStatus]) {
+      case ManagerReviewStatus.REVIEWED:
+        leadAction = LeadAction.REVIEWED;
+        break;
+      case ManagerReviewStatus.IN_PROGRESS:
+        leadAction = LeadAction.ACCEPTED;
+        break;
+      case ManagerReviewStatus.DISCARDED:
+        leadAction = LeadAction.DISCARDED;
+        break;
+      default:
+        leadAction = LeadAction.REASSIGNED;
+        break;
+    }
+
+    if (leadAction == LeadAction.REASSIGNED) {
+      await this.leadHistoryRepository.save({
+        customerId: customerFound.customer_id,
+        action: leadAction,
+        performedById: managerId,
+        userAnteriorAssing: userAnteriorAssing,
+        userAssigned: updateStatusCustomerDto.userId,
+        notes: updateStatusCustomerDto.notesOfUpdate,
+      });
+      const notif = new NotifityAlertAssignedCustomer();
+      notif.emailUserAssignment = customerFound.user.email;
+      notif.customer = customerFound.company_name;
+      notif.user = customerFound.user.name;
+
+      await this.mailService.notifityNewAssigmentLead(notif);
+    } else {
+      await this.leadHistoryRepository.save({
+        customerId: customerFound.customer_id,
+        action: leadAction,
+        performedById: managerId,
+        notes: updateStatusCustomerDto.notesOfUpdate,
+      });
+    }
+    return {
+      message: 'Customer status updated successfully',
+      customerId: customerFound.customer_id,
+      newStatus: customerFound.managerReviewStatus,
+      assignedUser: userId ?? null,
+    };
+  }
+
+  async getFunnerCharByBrach(branch: string) {
     const customers = await this.customersRepository.find({
       where: {
         user: {
           sucursales: {
-            nombre:
-             branch, // Asegúrate de que `nombre` es un atributo correcto de Sucursales
+            nombre: branch, // Asegúrate de que `nombre` es un atributo correcto de Sucursales
           },
           email: Like('%@propapel.com.mx'),
         },
@@ -239,19 +341,14 @@ export class CustomersService {
 
     const funnelData = {
       prospectos: customers.length,
-      contactados: customers.filter(
-        (c) => c.progressLead == 25,
-      ).length,
+      contactados: customers.filter((c) => c.progressLead == 25).length,
       interesados: customers.filter(
         (c) => c.progressLead == 40 || c.progressLead == 60,
       ).length,
-      negociacion: customers.filter((c) =>
-       c.progressLead == 90, //c.projects.some((p) => p.status === 'En negociacion'),
+      negociacion: customers.filter(
+        (c) => c.progressLead == 90, //c.projects.some((p) => p.status === 'En negociacion'),
       ).length,
-      cerrados: customers.filter(
-        (c) =>
-          c.progressLead == 100,
-      ).length,
+      cerrados: customers.filter((c) => c.progressLead == 100).length,
     };
 
     return funnelData;

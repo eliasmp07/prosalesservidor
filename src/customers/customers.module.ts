@@ -25,6 +25,8 @@ import { AppointmentService } from 'src/appointment/appointment.service';
 import { AppointmentController } from 'src/appointment/appointment.controller';
 import { RolesModule } from 'src/roles/roles.module';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { MailService } from 'src/auth/service/MailService';
 
 @Module({
   imports: [
@@ -39,6 +41,7 @@ import { SucursalesModule } from 'src/sucursales/sucursales.module';
       Reminder,
       Project,
       Appointment,
+      LeadHistory
     ]),
     ConfigModule, // Importa ConfigModule aquí
   ],
@@ -49,6 +52,7 @@ import { SucursalesModule } from 'src/sucursales/sucursales.module';
     OportunityService,
     InterationService,
     RemiderService,
+    MailService,
     AppointmentService,
   ],
   controllers: [

@@ -24,15 +24,17 @@ import { AppointmentService } from 'src/appointment/appointment.service';
 import { AppointmentController } from 'src/appointment/appointment.controller';
 import { RolesModule } from 'src/roles/roles.module';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { MailService } from 'src/auth/service/MailService';
 
 @Module({
   imports:[
     RolesModule, 
     SucursalesModule,
-    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder, Appointment]),
+    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder, Appointment, LeadHistory]),
     ConfigModule, // Importa ConfigModule aquí
   ],
-  providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService, AppointmentService],
+  providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService, AppointmentService, MailService],
   controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController, AppointmentController],
   exports: [RemiderService], 
 

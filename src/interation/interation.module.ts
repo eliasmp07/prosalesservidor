@@ -21,16 +21,40 @@ import { ConfigModule } from '@nestjs/config';
 import { RemiderController } from 'src/remider/remider.controller';
 import { RolesModule } from 'src/roles/roles.module';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
+import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
+import { MailService } from 'src/auth/service/MailService';
 
 @Module({
-  imports:[
+  imports: [
     RolesModule,
     SucursalesModule,
-    TypeOrmModule.forFeature([Customer, User, Opportunity, Interaction, Purchase, Reminder]),
+    TypeOrmModule.forFeature([
+      Customer,
+      User,
+      Opportunity,
+      Interaction,
+      Purchase,
+      Reminder,
+      LeadHistory,
+    ]),
     ConfigModule, // Importa ConfigModule aquí
   ],
-  providers: [CustomersService, UsersService, PurchaseService, OportunityService, InterationService, RemiderService],
-  controllers: [CustomersController, UsersController, OportunityController, InterationController, PurchaseController, RemiderController]
-
+  providers: [
+    CustomersService,
+    UsersService,
+    PurchaseService,
+    OportunityService,
+    InterationService,
+    RemiderService,
+    MailService,
+  ],
+  controllers: [
+    CustomersController,
+    UsersController,
+    OportunityController,
+    InterationController,
+    PurchaseController,
+    RemiderController,
+  ],
 })
 export class InterationModule {}
