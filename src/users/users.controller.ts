@@ -32,9 +32,26 @@ export class UsersController {
 
   //@UseGuards(JwtAuthGuard)
 
+  //NEW VERSION GET INFO
+
+  @Get('findAllUserByBranch/:sucursalId')
+  findAllUserBySucursal(@Param('sucursalId', ParseIntPipe) id: number) {
+    return this.usersService.findAllUserByBranch(id)
+  }
+
   @Put('updateInfo')
   updateInfoUser( @Body() UpdateInfoUserDto: UpdateInfoUserDto){
     return this.usersService.updateInfoUser(UpdateInfoUserDto)
+  }
+
+  @Get('findByAllUsers')
+  findByAllUsers(){
+    return this.usersService.findBYAllUsers();
+  }
+
+  @Get('findByUserAllUsersBranches')
+  findByAllUsersByBranch() {
+    return this.usersService.findByAllUsersByBranches();
   }
 
   @Get('getAllUsers')

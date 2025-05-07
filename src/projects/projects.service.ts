@@ -77,7 +77,7 @@ export class ProjectsService {
     const projects = await this.projectRepository.find({
       where: {
         customer: {
-          customer_id: customerId,
+          customer_id: customerId
         },
       },
       relations: ['customer', 'products'],
@@ -87,6 +87,7 @@ export class ProjectsService {
   }
 
   async findAllByUserId(userId: number) {
+    console.log(userId)
     const projects = await this.projectRepository.find({
       where: {
         customer: {

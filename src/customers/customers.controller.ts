@@ -17,6 +17,21 @@ import { UpdateStatusCustomerDto } from './dto/update_status_customer.dto';
 export class CustomersController {
   constructor(private customerService: CustomersService) {}
 
+  @Get('findAll')
+  findAll() {
+    return this.customerService.findAll();
+  }
+
+  @Get('findAllCustomersByUserId/:id')
+  findAllCustomerByUserId(@Param('id', ParseIntPipe) id: number) {
+    return this.customerService.findAllCustomerByUserId(id);
+  }
+
+  @Get('findById/:id')
+  findById(@Param('id', ParseIntPipe) id: number){
+    return this.customerService.findById(id)
+  }
+
   @Post('createLead')
   createLead(@Body() customer: CreateCustomerDto) {
     this.customerService.createNewVersion(customer);
@@ -25,7 +40,11 @@ export class CustomersController {
   @Put('updateStatusManager')
   updateStatusManager(@Body() updateStatusCustomerDto: UpdateStatusCustomerDto){
      return this.customerService.updateStatusLead(updateStatusCustomerDto)
+     
   }
+
+
+  ///ALL
   
   @Post('create')
   create(@Body() customer: CreateCustomerDto) {
@@ -37,6 +56,7 @@ export class CustomersController {
     return this.customerService.getCustomerById(customerId);
   }
 
+  //This funtion remove dont work with new version
   @Get('myCustomers/:id')
   findMyCustomers(@Param('id', ParseIntPipe) id: number) {
     return this.customerService.getMyCustomer(id);
@@ -52,6 +72,7 @@ export class CustomersController {
      return this.customerService.getFunnerCharByBrach(branch)
   }
 
+  //This function don´t work with the new version 
   @Get('getAllCustomers')
   getAllCustomers() {
     return this.customerService.getAllCustomer();

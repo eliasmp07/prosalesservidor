@@ -401,6 +401,59 @@ export class CustomersService {
     });
     return { customers: customers };
   }
+  /**
+   *  Funcion que devuelve todos los lead registrados
+   *  
+   */
+  async findAll() {
+    const customers = await this.customersRepository.find({
+      where: {
+        user: {
+          email: Like('%@propapel.com.mx'),
+        },
+      },
+      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
+    });
+    return { customers: customers };
+  }
+
+  /**
+   * 
+   */
+
+  async findById(id: number) {
+    const customer = await this.customersRepository.findOne({
+      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
+      where: {
+        customer_id: id
+      },
+    });
+
+    await this.customersRepository.save(customer); // Persistir el progreso calculado
+
+    return customer;
+  }
+
+  /**
+   * Funcion para trabajar las llamadas de un solo lead
+   * @param idCustomer F
+   * @param updateCustomerDto 
+   */
+  async findByUserId(id: number) {
+    const getMyCustomers = await this.customersRepository.find({
+      where: { user: { id } }, // Filtra por el id del usuario relacionado,
+      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
+    });
+
+    // Usar map para calcular el progreso y actualizar al mismo tiempo
+    const updatedCustomers = await Promise.all(
+      getMyCustomers.map(async (customer) => {
+        customer.calculateProgress(id);
+        return this.customersRepository.save(customer); // Guardar los cambios
+      }),
+    );
+    return { customers: updatedCustomers };
+  }
 
   async updateCustomer(
     idCustomer: number,
@@ -420,5 +473,21 @@ export class CustomersService {
     // Assign updated fields to `customer` and rename the result variable
     const updatedCustomer = Object.assign(customer, updateCustomerDto);
     await this.customersRepository.save(updatedCustomer);
+  }
+
+  async findAllCustomerByUserId(id: number) {
+    const getMyCustomers = await this.customersRepository.find({
+      where: { user: { id } }, // Filtra por el id del usuario relacionado,
+      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
+    });
+
+    // Usar map para calcular el progreso y actualizar al mismo tiempo
+    const updatedCustomers = await Promise.all(
+      getMyCustomers.map(async (customer) => {
+        customer.calculateProgress(id);
+        return this.customersRepository.save(customer); // Guardar los cambios
+      }),
+    );
+    return { customers: updatedCustomers };
   }
 }

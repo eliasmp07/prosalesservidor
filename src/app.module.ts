@@ -21,6 +21,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MailService } from './auth/service/MailService';
 import { ActivityModule } from './activity/activity.module';
 import { LeadHistoryModule } from './lead-history/lead-history.module';
+import { LeadNotesModule } from './lead-notes/lead-notes.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -50,7 +52,9 @@ import { LeadHistoryModule } from './lead-history/lead-history.module';
     BannersModule,
     AppointmentModule,
     ActivityModule,
-    LeadHistoryModule
+    LeadHistoryModule,
+    LeadNotesModule,
+    SocketModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskService, MailService],

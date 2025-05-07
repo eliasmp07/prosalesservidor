@@ -18,7 +18,7 @@ import { Appointment } from 'src/appointment/entities/appointment.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
 import { ManagerReviewStatus } from 'src/enums/lead_manager_review';
 import { LeadStatus } from 'src/enums/lead_status';
-
+import { LeadNote } from 'src/lead-notes/entities/lead-note.entity';
 
 @Entity('customers')
 export class Customer {
@@ -46,6 +46,9 @@ export class Customer {
     default: LeadStatus.PROSPECT,
   })
   status: LeadStatus;
+
+  @OneToMany(() => LeadNote, (note) => note.customer, {  eager: true })
+  notes: LeadNote[];
 
   @Column({
     type: 'enum',
@@ -112,7 +115,8 @@ export class Customer {
   @BeforeInsert()
   @BeforeUpdate()
   updateProgress() {
-    if (this.user) { // Asegúrate que 'user' no sea undefined
+    if (this.user) {
+      // Asegúrate que 'user' no sea undefined
       this.calculateProgress(this.user.id);
     }
   }
@@ -152,7 +156,7 @@ export class Customer {
           progress = 40.0;
         } else {
           const hasNegotiation = this.projects.some(
-            (project) => project.status === 'En negociacion'
+            (project) => project.status === 'En negociacion',
           );
 
           if (hasNegotiation) {
@@ -167,4 +171,3 @@ export class Customer {
     }
   }
 }
-

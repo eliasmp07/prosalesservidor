@@ -333,4 +333,100 @@ export class UsersService {
     console.log();
     return data;
   }
+
+  // NEW VERSION GET INFO
+  
+  async findBYAllUsers() {
+    const users = await this.usersRepository.find({
+      where: [
+        { email: Like('%@optivosa.com') },
+        { email: Like('%@propapel.com.mx') },
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.notes',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+
+    return { users };
+  }
+
+  /**
+   * 
+   * @returns 
+   */
+  async findByAllUsersByBranches() {
+    const usersFound = await this.usersRepository.find({
+      where: [
+        { email: Like('%@propapel.com.mx') },
+        { email: Like('%@optivosa.com') }
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.notes',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+  
+    const merida = 'Propapel Merida';
+    const mty = 'Propapel Monterrey';
+    const mexico = 'Propapel Mexico';
+  
+    const usersBySucursal = {
+      merida: usersFound.filter((user) =>
+        user.sucursales.some((sucursal) => sucursal.nombre === merida),
+      ),
+      monterrey: usersFound.filter((user) =>
+        user.sucursales.some((sucursal) => sucursal.nombre === mty),
+      ),
+      mexico: usersFound.filter((user) =>
+        user.sucursales.some((sucursal) => sucursal.nombre === mexico),
+      ),
+    };
+  
+    return usersBySucursal;
+  }
+
+  /**
+   * 
+   */
+  async findAllUserByBranch(sucursalId: number) {
+    const users = await this.usersRepository.find({
+      where: [
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('1') },
+          email: Like('%@propapel.com.mx'),
+        },
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('1') },
+          email: Like('%@optivosa.com'),
+        },
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.notes',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+
+    return { users };
+  }
 }
