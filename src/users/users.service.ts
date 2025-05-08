@@ -77,7 +77,7 @@ export class UsersService {
     const user = await this.usersRepository.findOne({
       where: [
         { id: id, email: Like('%@propapel.com.mx') },
-        { id: id, email: Like('%@optivosa.com') }
+        { id: id, email: Like('%@optivosa.com') },
       ],
       relations: [
         'sucursales',
@@ -91,13 +91,12 @@ export class UsersService {
     });
     return user;
   }
-  
 
   async getAllUserBySucursales() {
     const users = await this.usersRepository.find({
       where: [
         { email: Like('%@propapel.com.mx') },
-        { email: Like('%@optivosa.com') }
+        { email: Like('%@optivosa.com') },
       ],
       relations: [
         'sucursales',
@@ -111,13 +110,12 @@ export class UsersService {
     });
     return users;
   }
-  
 
   async findUserBySucursale() {
     const usersFound = await this.usersRepository.find({
       where: [
         { email: Like('%@propapel.com.mx') },
-        { email: Like('%@optivosa.com') }
+        { email: Like('%@optivosa.com') },
       ],
       relations: [
         'sucursales',
@@ -129,11 +127,11 @@ export class UsersService {
         'customers.projects',
       ],
     });
-  
+
     const merida = 'Propapel Merida';
     const mty = 'Propapel Monterrey';
     const mexico = 'Propapel Mexico';
-  
+
     const usersBySucursal = {
       merida: usersFound.filter((user) =>
         user.sucursales.some((sucursal) => sucursal.nombre === merida),
@@ -145,29 +143,27 @@ export class UsersService {
         user.sucursales.some((sucursal) => sucursal.nombre === mexico),
       ),
     };
-  
+
     return usersBySucursal;
   }
-  
 
   async findAll() {
     const users = await this.usersRepository.find({
       where: [
         { email: Like('%@propapel.com.mx') },
-        { email: Like('%@optivosa.com') }
+        { email: Like('%@optivosa.com') },
       ],
     });
-  
+
     const data = users.map((user) => ({
       lastname: user.lastname,
       name: user.name,
       phone: user.phone,
       image: user.image,
     }));
-  
+
     return { users: data };
   }
-  
 
   async update(id: number, user: UpdateUserDto) {
     console.log('ID recibido:', id);
@@ -335,7 +331,7 @@ export class UsersService {
   }
 
   // NEW VERSION GET INFO
-  
+
   async findBYAllUsers() {
     const users = await this.usersRepository.find({
       where: [
@@ -358,14 +354,14 @@ export class UsersService {
   }
 
   /**
-   * 
-   * @returns 
+   *
+   * @returns
    */
   async findByAllUsersByBranches() {
     const usersFound = await this.usersRepository.find({
       where: [
         { email: Like('%@propapel.com.mx') },
-        { email: Like('%@optivosa.com') }
+        { email: Like('%@optivosa.com') },
       ],
       relations: [
         'sucursales',
@@ -378,11 +374,11 @@ export class UsersService {
         'customers.projects',
       ],
     });
-  
+
     const merida = 'Propapel Merida';
     const mty = 'Propapel Monterrey';
     const mexico = 'Propapel Mexico';
-  
+
     const usersBySucursal = {
       merida: usersFound.filter((user) =>
         user.sucursales.some((sucursal) => sucursal.nombre === merida),
@@ -394,12 +390,12 @@ export class UsersService {
         user.sucursales.some((sucursal) => sucursal.nombre === mexico),
       ),
     };
-  
+
     return usersBySucursal;
   }
 
   /**
-   * 
+   *
    */
   async findAllUserByBranch(sucursalId: number) {
     const users = await this.usersRepository.find({
@@ -429,4 +425,89 @@ export class UsersService {
 
     return { users };
   }
+
+  async findAllDatesNowByAllUsers(): Promise<InfoTableDatesDto[]> {
+    /*
+     const timestamp: number = Number(reminder.reminder_date);
+      const dateUTC = new Date(timestamp).toISOString();
+      const reminderDate = new Date(dateUTC);
+      const today = new Date();
+    */
+    const today = new Date();
+
+    const users = await this.usersRepository.find({
+      where: [
+        { email: Like('%@optivosa.com') },
+        { email: Like('%@propapel.com.mx') },
+      ],
+      relations: ['sucursales', 'customers', 'customers.reminders',],
+    });
+
+    const results: InfoTableDatesDto[] = [];
+
+    for (const user of users) {
+      const saleExecutive = `${user.name} ${user.lastname}`;
+      const clave = this.detectWalletByUser(user.id) || 'Sin clave';
+      let totalDates = 0;
+
+      for (const customer of user.customers || []) {
+        for (const reminder of customer.reminders || []) {
+          const timestamp: number = Number(reminder.reminder_date);
+          const dateUTC = new Date(timestamp).toISOString();
+          const reminderDate = new Date(dateUTC);
+
+            if (
+              reminder.is_completed && reminderDate.getUTCFullYear() === today.getUTCFullYear() &&
+              reminderDate.getUTCMonth() === today.getUTCMonth() &&
+              this.isAppointmentTypeValid(reminder.typeAppointment)
+            ) {
+              totalDates++;
+            }
+      
+        }
+      }
+
+      if (totalDates > 0) {
+        results.push({
+          saleExecutive,
+          clave,
+          totalDates,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  private detectWalletByUser(id: number): string {
+    const walletMap: Record<number, string> = {
+      43: "P065",
+      36: "359",
+      46: "P419",
+      51: "P470",
+      47: "P471",
+      45: "P501",
+      27: "520",
+      44: "P595",
+      28: "P596",
+      29: "P21",
+      38: "P52",
+      26: "P53",
+    };
+  
+    return walletMap[id] ?? "";
+  }
+  
+  private isAppointmentTypeValid(type: string): boolean {
+    const validTypes = ['Presencial', 'Reunion Remota']; // ejemplo
+    return validTypes.includes(type);
+  }
+
+  
+}
+
+export class InfoTableDatesDto {
+  saleExecutive: string;
+  clave: string;
+  totalDates: number;
 }

@@ -9,4 +9,8 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+  @Get('citas')
+  getCitas(): string{
+    return this.appService.getDates();
+  }
 }
