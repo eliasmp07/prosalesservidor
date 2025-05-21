@@ -23,6 +23,8 @@ import { ActivityModule } from './activity/activity.module';
 import { LeadHistoryModule } from './lead-history/lead-history.module';
 import { LeadNotesModule } from './lead-notes/lead-notes.module';
 import { SocketModule } from './socket/socket.module';
+import { ConversationModule } from './conversation/conversation.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -54,7 +56,9 @@ import { SocketModule } from './socket/socket.module';
     ActivityModule,
     LeadHistoryModule,
     LeadNotesModule,
-    SocketModule
+    SocketModule,
+    ConversationModule,
+    MessageModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskService, MailService],

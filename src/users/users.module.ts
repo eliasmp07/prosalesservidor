@@ -20,12 +20,13 @@ import { RolesModule } from 'src/roles/roles.module';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
 import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
 import { MailService } from 'src/auth/service/MailService';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
 
 @Module({
   imports:[
     SucursalesModule,
     RolesModule,
-    TypeOrmModule.forFeature([User, Customer, Purchase, Opportunity, Reminder, Interaction, LeadHistory]),
+    TypeOrmModule.forFeature([User, Customer, Purchase, Opportunity, Reminder, Interaction, LeadHistory,  Conversation]),
     ConfigModule, // Importa ConfigModule aquí,
   ],
   providers: [CustomersService, UsersService, AccessTokenStrategy, RefreshTokenStrategy, CustomersService, OportunityService, PurchaseService, RemiderService, MailService],

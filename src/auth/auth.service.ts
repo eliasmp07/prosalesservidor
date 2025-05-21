@@ -87,6 +87,8 @@ export class AuthService {
       if (imageUrl) {
         newUser.image = imageUrl; // Guarda la URL de la imagen
       }
+    }else {
+      newUser.image = "https://firebasestorage.googleapis.com/v0/b/prosales-c49e5.appspot.com/o/whatsapp-profiline-kendi-fotografini-koymayan-kisi_1132920.jpg?alt=media&token=2349da39-e2b7-4a0b-aebf-9313ad141aa1"
     }
 
     // 6️⃣ Guarda el usuario en la base de datos

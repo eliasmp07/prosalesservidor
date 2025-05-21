@@ -16,20 +16,19 @@ import { UpdateStatusCustomerDto } from './dto/update_status_customer.dto';
 @Controller('customers')
 export class CustomersController {
   constructor(private customerService: CustomersService) {}
-
-  @Get('findAll')
-  findAll() {
-    return this.customerService.findAll();
-  }
-
   @Get('findAllCustomersByUserId/:id')
   findAllCustomerByUserId(@Param('id', ParseIntPipe) id: number) {
     return this.customerService.findAllCustomerByUserId(id);
   }
 
+  @Get('findAllCustomerByType/:id')
+  findAllCustomerByType(@Param('id', ParseIntPipe) id: number) {
+    return this.customerService.findAllCustomersByTypes(id);
+  }
+
   @Get('findById/:id')
-  findById(@Param('id', ParseIntPipe) id: number){
-    return this.customerService.findById(id)
+  findById(@Param('id', ParseIntPipe) id: number) {
+    return this.customerService.findById(id);
   }
 
   @Post('createLead')
@@ -38,14 +37,14 @@ export class CustomersController {
   }
 
   @Put('updateStatusManager')
-  updateStatusManager(@Body() updateStatusCustomerDto: UpdateStatusCustomerDto){
-     return this.customerService.updateStatusLead(updateStatusCustomerDto)
-     
+  updateStatusManager(
+    @Body() updateStatusCustomerDto: UpdateStatusCustomerDto,
+  ) {
+    return this.customerService.updateStatusLead(updateStatusCustomerDto);
   }
 
-
   ///ALL
-  
+
   @Post('create')
   create(@Body() customer: CreateCustomerDto) {
     this.customerService.create(customer);
@@ -68,11 +67,11 @@ export class CustomersController {
   }
 
   @Get('getFunnerChartByBranch/:branch')
-  findFunnerChartByBranch(@Param('branch') branch: string){
-     return this.customerService.getFunnerCharByBrach(branch)
+  findFunnerChartByBranch(@Param('branch') branch: string) {
+    return this.customerService.getFunnerCharByBrach(branch);
   }
 
-  //This function don´t work with the new version 
+  //This function don´t work with the new version
   @Get('getAllCustomers')
   getAllCustomers() {
     return this.customerService.getAllCustomer();

@@ -47,6 +47,7 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
+        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
       ],
     });
 
@@ -67,6 +68,8 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
+        'customers.conversation', 
+        'customers.conversation.messages', 'customers.conversation.customer'
       ],
     });
 
@@ -87,6 +90,7 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
+        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
       ],
     });
     return user;
@@ -102,6 +106,7 @@ export class UsersService {
         'sucursales',
         'roles',
         'customers',
+        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer',
         'customers.interactions',
         'customers.purchases',
         'customers.reminders',
@@ -125,6 +130,8 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
+        'customers.conversation', 
+        'customers.conversation.messages',, 'customers.conversation.customer'
       ],
     });
 
@@ -344,6 +351,7 @@ export class UsersService {
         'customers',
         'customers.notes',
         'customers.interactions',
+        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer',
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
@@ -372,6 +380,7 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
+        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
       ],
     });
 
@@ -420,6 +429,7 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
+        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
       ],
     });
 

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { LeadNotesService } from './lead-notes.service';
 import { CreateLeadNoteDto } from './dto/create-lead-note.dto';
 import { UpdateLeadNoteDto } from './dto/update-lead-note.dto';
@@ -12,6 +21,20 @@ export class LeadNotesController {
     return this.leadNotesService.create(createLeadNoteDto);
   }
 
+  @Get('findAllNotesUnread/:id')
+  findAllNotesUnread(@Param('id', ParseIntPipe) id: number) {
+    return this.leadNotesService.getUnreadNotesForUser(id);
+  }
+
+  @Post('markReaded/:id')
+  markReadingNotificacion(@Param('id', ParseIntPipe) id: number) {
+    return this.leadNotesService.getUnreadNotesForUser(id);
+  }
+
+  @Post('markAllAsReadForUser/:id')
+  markAllAsReadForUser(@Param('id', ParseIntPipe) id: number) {
+    return this.leadNotesService.markAllAsReadForUser(id)
+  }
   @Get()
   findAll() {
     return this.leadNotesService.findAll();
@@ -23,7 +46,10 @@ export class LeadNotesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLeadNoteDto: UpdateLeadNoteDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateLeadNoteDto: UpdateLeadNoteDto,
+  ) {
     return this.leadNotesService.update(+id, updateLeadNoteDto);
   }
 

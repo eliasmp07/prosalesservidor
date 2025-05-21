@@ -24,6 +24,7 @@ import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 import { SucursalesModule } from 'src/sucursales/sucursales.module';
 import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
 import { MailService } from 'src/auth/service/MailService';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { MailService } from 'src/auth/service/MailService';
     SucursalesModule,
     TypeOrmModule.forFeature([
       Customer,
+       Conversation,
       User,
       Opportunity,
       Interaction,

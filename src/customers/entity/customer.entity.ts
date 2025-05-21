@@ -7,6 +7,7 @@ import {
   AfterLoad,
   BeforeInsert,
   BeforeUpdate,
+  OneToOne,
 } from 'typeorm';
 import { Opportunity } from '../../oportunity/entity/oportunity.entity';
 import { Interaction } from '../../interation/entity/interation.entity';
@@ -19,6 +20,7 @@ import { Activity } from 'src/activity/entities/activity.entity';
 import { ManagerReviewStatus } from 'src/enums/lead_manager_review';
 import { LeadStatus } from 'src/enums/lead_status';
 import { LeadNote } from 'src/lead-notes/entities/lead-note.entity';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
 
 @Entity('customers')
 export class Customer {
@@ -40,6 +42,9 @@ export class Customer {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   progressLead: number;
 
+  @OneToOne(() => Conversation, (conversation) => conversation.customer)
+  conversation: Conversation;
+
   @Column({
     type: 'enum',
     enum: LeadStatus,
@@ -47,7 +52,7 @@ export class Customer {
   })
   status: LeadStatus;
 
-  @OneToMany(() => LeadNote, (note) => note.customer, {  eager: true })
+  @OneToMany(() => LeadNote, (note) => note.customer)
   notes: LeadNote[];
 
   @Column({

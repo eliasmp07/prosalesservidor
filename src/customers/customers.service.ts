@@ -16,6 +16,7 @@ import { LeadStatus } from 'src/enums/lead_status';
 import { ManagerReviewStatus } from 'src/enums/lead_manager_review';
 import { MailService } from 'src/auth/service/MailService';
 import { NotifityAlertAssignedCustomer } from 'src/auth/service/notifityAlertAssignedCustomer.dto';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
 
 @Injectable()
 export class CustomersService {
@@ -34,6 +35,8 @@ export class CustomersService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(LeadHistory)
     private leadHistoryRepository: Repository<LeadHistory>,
+    @InjectRepository(Conversation)
+    private conversationRepository: Repository<Conversation>,
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
@@ -147,6 +150,13 @@ export class CustomersService {
       });
       await this.remindersRepository.save(reminderEntities);
     }
+
+    const conversation = this.conversationRepository.create({
+      customer: customer,
+      ejecutivo: customer.user,
+    });
+
+    await this.conversationRepository.save(conversation);
 
     await this.leadHistoryRepository.save({
       customerId: customer.customer_id,
@@ -341,14 +351,14 @@ export class CustomersService {
 
     const funnelData = {
       prospectos: customers.length,
-      contactados: customers.filter((c) => c.progressLead == 25).length,
+      contactados: customers.filter((c) => c.status == LeadStatus.CONTACTED).length,
       interesados: customers.filter(
-        (c) => c.progressLead == 40 || c.progressLead == 60,
+        (c) =>  c.status == LeadStatus.INTERESTED,
       ).length,
       negociacion: customers.filter(
-        (c) => c.progressLead == 90, //c.projects.some((p) => p.status === 'En negociacion'),
+        (c) => c.status == LeadStatus.NEGOTIATION, //c.projects.some((p) => p.status === 'En negociacion'),
       ).length,
-      cerrados: customers.filter((c) => c.progressLead == 100).length,
+      cerrados: customers.filter((c) => c.status == LeadStatus.CLIENT).length,
     };
 
     return funnelData;
@@ -369,24 +379,17 @@ export class CustomersService {
       ],
     });
 
-    const funnelData = {
+     const funnelData = {
       prospectos: customers.length,
-      contactados: customers.filter(
-        (c) => c.interactions && c.interactions.length > 0,
-      ).length,
+      contactados: customers.filter((c) => c.status == LeadStatus.CONTACTED).length,
       interesados: customers.filter(
-        (c) => c.purchases && c.purchases.length > 0,
+        (c) =>  c.status == LeadStatus.INTERESTED,
       ).length,
-      negociacion: customers.filter((c) =>
-        c.projects.some((p) => p.status === 'En negociacion'),
+      negociacion: customers.filter(
+        (c) => c.status == LeadStatus.NEGOTIATION, //c.projects.some((p) => p.status === 'En negociacion'),
       ).length,
-      cerrados: customers.filter(
-        (c) =>
-          c.projects.some((p) => p.status === 'Cierre') ||
-          c.progressLead === 100,
-      ).length,
+      cerrados: customers.filter((c) => c.status == LeadStatus.CLIENT).length,
     };
-
     return funnelData;
   }
 
@@ -401,35 +404,24 @@ export class CustomersService {
     });
     return { customers: customers };
   }
-  /**
-   *  Funcion que devuelve todos los lead registrados
-   *  
-   */
-  async findAll() {
-    const customers = await this.customersRepository.find({
-      where: {
-        user: {
-          email: Like('%@propapel.com.mx'),
-        },
-      },
-      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
-    });
-    return { customers: customers };
-  }
 
   /**
-   * 
+   *
    */
 
   async findById(id: number) {
     const customer = await this.customersRepository.findOne({
-      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
+      relations: [
+        'opportunities',
+        'interactions',
+        'purchases',
+        'reminders',
+        'notes',
+      ],
       where: {
-        customer_id: id
+        customer_id: id,
       },
     });
-
-    await this.customersRepository.save(customer); // Persistir el progreso calculado
 
     return customer;
   }
@@ -437,12 +429,18 @@ export class CustomersService {
   /**
    * Funcion para trabajar las llamadas de un solo lead
    * @param idCustomer F
-   * @param updateCustomerDto 
+   * @param updateCustomerDto
    */
   async findByUserId(id: number) {
     const getMyCustomers = await this.customersRepository.find({
       where: { user: { id } }, // Filtra por el id del usuario relacionado,
-      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
+      relations: [
+        'opportunities',
+        'interactions',
+        'purchases',
+        'reminders',
+        'notes',
+      ],
     });
 
     // Usar map para calcular el progreso y actualizar al mismo tiempo
@@ -478,7 +476,13 @@ export class CustomersService {
   async findAllCustomerByUserId(id: number) {
     const getMyCustomers = await this.customersRepository.find({
       where: { user: { id } }, // Filtra por el id del usuario relacionado,
-      relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'notes'],
+      relations: [
+        'opportunities',
+        'interactions',
+        'purchases',
+        'reminders',
+        'notes',
+      ],
     });
 
     // Usar map para calcular el progreso y actualizar al mismo tiempo
@@ -489,5 +493,28 @@ export class CustomersService {
       }),
     );
     return { customers: updatedCustomers };
+  }
+
+  async findAllCustomersByTypes(id: number) {
+    const customersFound = await this.customersRepository.find({
+      where: {
+        user: {
+          id: id,
+        },
+      },
+    });
+
+    const data = {
+      all: customersFound.length,
+      news: customersFound.filter((c) => c.type_of_client.includes("Nuevo")).length,
+      recovery: customersFound.filter(
+        (c) =>  c.type_of_client.includes("Recuperación")
+      ).length,
+      developer: customersFound.filter(
+        (c) =>  c.type_of_client.includes("Expansión de producto"), //c.projects.some((p) => p.status === 'En negociacion'),
+      ).length
+    };
+
+    return data;
   }
 }
