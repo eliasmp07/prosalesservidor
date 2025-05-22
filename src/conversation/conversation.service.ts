@@ -26,7 +26,7 @@ export class ConversationService {
       ejecutivo: customerFound.user,
     });
 
-    await this.conversationRepository.save(conversation);
+    return await this.conversationRepository.save(conversation);
   }
 
   async finAllConversationsByUser(userId: number) {
