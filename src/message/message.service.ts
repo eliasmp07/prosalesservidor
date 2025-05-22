@@ -18,38 +18,36 @@ export class MessageService {
     private messageRepository: Repository<Message>,
   ) {}
 
-  async findAllConversationByCustomerId(id: number){
+  async findAllConversationByCustomerId(id: number) {
     const conversationFound = this.conversationRepository.findOne({
       where: {
-        id : id
-      }
-    })
+        id: id,
+      },
+    });
 
-    return (await conversationFound).messages
+    return (await conversationFound).messages;
   }
 
-  async findAllMessagesByUserExecutive(id: number){
-    const conversationFounds = await this.conversationRepository.find(
-      {
-        where: {
-           ejecutivo: {
-              id: id
-           }
+  async findAllMessagesByUserExecutive(id: number) {
+    const conversationFounds = await this.conversationRepository.find({
+      where: {
+        ejecutivo: {
+          id: id,
         },
-        relations : ['messages']
-      }
-    )
-    return conversationFounds
+      },
+      relations: ['messages'],
+    });
+    return conversationFounds;
   }
 
-  async findConversationById(id: number){
+  async findConversationById(id: number) {
     const conversationFound = await this.conversationRepository.findOne({
       where: {
-         id: id
-      }
-    })
+        id: id,
+      },
+    });
 
-    return conversationFound
+    return conversationFound;
   }
 
   async create(createMessageDto: CreateMessageDto) {
@@ -62,14 +60,18 @@ export class MessageService {
 
     const userFound = await this.userRepository.findOne({
       where: {
-        id: createMessageDto.userSenderId
+        id: createMessageDto.userSenderId,
       },
     });
 
+    const allowedRoles = new Set(['gerente', 'gerente regional']);
+    const rol = createMessageDto.rolUser?.toLowerCase().trim();
+
     if (
-      (createMessageDto.rolUser === 'Gerente' ||
-        createMessageDto.rolUser === 'Gerente Regional') &&
-      !conversationFound.admins.some((admin) => admin.id === userFound.id)
+      allowedRoles.has(rol) &&
+      !conversationFound.admins.some(
+        (admin) => admin.id.toString() === userFound.id.toString(),
+      )
     ) {
       conversationFound.admins.push(userFound);
       await this.conversationRepository.save(conversationFound);
@@ -79,36 +81,39 @@ export class MessageService {
       sender: userFound,
       conversation: conversationFound,
       content: createMessageDto.content,
-      isRead: createMessageDto.isRead
+      isRead: createMessageDto.isRead,
     });
 
-    const createdMessageResponse = await this.messageRepository.save(messageCreate)
+    const createdMessageResponse =
+      await this.messageRepository.save(messageCreate);
     return {
-       content: createdMessageResponse.content,
-       id: createdMessageResponse.id,
-       sentAt: createdMessageResponse.sentAt,
-       isRead: createdMessageResponse.isRead,
-       sender: createdMessageResponse.sender
+      content: createdMessageResponse.content,
+      id: createdMessageResponse.id,
+      sentAt: createdMessageResponse.sentAt,
+      isRead: createdMessageResponse.isRead,
+      sender: createdMessageResponse.sender,
     };
   }
 
-  async markMessagesAsRead(conversationId: number, userId: number): Promise<Message[]> {
-  const unreadMessages = await this.messageRepository.find({
-    where: {
-      conversation: { id: conversationId },
-      sender: { id: Not(userId) }, // no marcar como leído los mensajes propios
-      isRead: false,
-    },
-    relations: ['conversation', 'sender'],
-  });
+  async markMessagesAsRead(
+    conversationId: number,
+    userId: number,
+  ): Promise<Message[]> {
+    const unreadMessages = await this.messageRepository.find({
+      where: {
+        conversation: { id: conversationId },
+        sender: { id: Not(userId) }, // no marcar como leído los mensajes propios
+        isRead: false,
+      },
+      relations: ['conversation', 'sender'],
+    });
 
-  for (const message of unreadMessages) {
-    message.isRead = true;
+    for (const message of unreadMessages) {
+      message.isRead = true;
+    }
+
+    return this.messageRepository.save(unreadMessages);
   }
-
-  return this.messageRepository.save(unreadMessages);
-}
-
 
   findAll() {
     return `This action returns all message`;
