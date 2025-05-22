@@ -133,11 +133,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
 
-    // Emitir el mensaje en la conversación
+      /*
     this.server.to(`conversation-${conversationId}`).emit('newMessage', {
       conversationId,
       message,
     });
+  ]*/
 
     this.server.emit('newMessage', {
       conversationId,
