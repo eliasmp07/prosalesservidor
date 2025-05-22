@@ -119,7 +119,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     // Notificar por roles
-    const conversation =
+   
+
+      /*
+       const conversation =
       await this.messageService.findConversationById(conversationId);
     if (data.rolUser == 'Gerente' || data.rolUser == 'Gerente regional') {
       this.server
@@ -132,8 +135,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
           .emit('Notification', message);
       });
     }
-
-      /*
     this.server.to(`conversation-${conversationId}`).emit('newMessage', {
       conversationId,
       message,
