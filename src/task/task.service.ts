@@ -43,13 +43,13 @@ export class TaskService {
       const countByStatus = {
         total: leadsThisWeek.length,
         desarrolloLeads: leadsThisWeek.filter(
-          (c) => c.type_of_client === 'Expansión de producto 🌱',
+          (c) =>  c.type_of_client.includes("Expansión de producto"),
         ).length,
         recuperacionLeads: leadsThisWeek.filter(
-          (c) => c.type_of_client === 'Recuperación 🔄',
+          (c) => c.type_of_client.includes("Recuperación"),
         ).length,
         newLeads: leadsThisWeek.filter(
-          (c) => c.type_of_client === 'Expansión de producto 🌱',
+          (c) => c.type_of_client.includes("Nuevo"),
         ).length,
         reminderTotal: leadsThisWeek.reduce((sum, lead) => {
           const validReminders = (lead.reminders || []).filter((reminder) => {
