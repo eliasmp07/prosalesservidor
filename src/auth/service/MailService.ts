@@ -6,6 +6,8 @@ import HTML_TEMPLATE_TOMORROW from './mail_body_tomorrow';
 import HTML_TEMPLATE_IN_ONE_HOUR from './mail_body_in_one_hour';
 import { NotifityAlertAssignedCustomer } from './notifityAlertAssignedCustomer.dto';
 import HTML_ASSING_USER_ALERT from './mail_body_assigned_user';
+import HTML_TEMPLATE_PROGRESS from './mail_progress_executive';
+import { MailProgressExecutiveDto } from '../dto/mailProgressExecutiveDto';
 
 @Injectable()
 export class MailService {
@@ -52,6 +54,32 @@ export class MailService {
     };
 
     await this.transporter.sendMail(mailOptions);
+  }
+
+  async sendProgressExecutive(
+    progressExecutive: MailProgressExecutiveDto
+  ){
+    const mailOptions = {
+      from: 'crm-propapel@propapel.com.mx',
+      to: progressExecutive.email,
+      subject: 'Progreso',
+      html: HTML_TEMPLATE_PROGRESS(
+         progressExecutive.leadTotal,
+         progressExecutive.desarrolloLeads,
+         progressExecutive.recuperacionLeads,
+         progressExecutive.userName,
+         progressExecutive.newLeads,
+         progressExecutive.reminderTotal,
+         progressExecutive.logoUrl
+      ),
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Correo de alerta enviado a ${progressExecutive.email}`);
+    } catch (error) {
+      console.error('Error al enviar el correo de alerta:', error);
+    }
   }
 
   async sendAlertEmail(alertReminder: alertReminderDto) {

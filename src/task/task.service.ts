@@ -1,20 +1,86 @@
 import { Injectable } from '@nestjs/common';
+import { startOfWeek, endOfWeek, getMonth, getYear } from 'date-fns';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { alertReminderDto } from 'src/auth/dto/alert_reminder.dto';
+import { MailProgressExecutiveDto } from 'src/auth/dto/mailProgressExecutiveDto';
 import { MailService } from 'src/auth/service/MailService';
 import { RemiderService } from 'src/remider/remider.service';
+import { UsersService } from 'src/users/users.service';
+import { LeadStatus } from 'src/enums/lead_status';
 
 @Injectable()
 export class TaskService {
   constructor(
     private mailService: MailService,
+    private userRepository: UsersService,
     private remindersRepository: RemiderService,
   ) {}
 
   private formatAMAndPM(hour: number): string {
-    return hour >= 0 && hour < 12 ? "AM" : "PM";
+    return hour >= 0 && hour < 12 ? 'AM' : 'PM';
   }
 
+  @Cron(CronExpression.EVERY_MINUTE, {
+    name: 'citas antes es mero dia',
+    timeZone: 'America/Mexico_City',
+  }) // sábado a las 00:00
+  async handlerExecutivesEverySaturdayAt9AM() {
+    const now = new Date();
+    const startDate = startOfWeek(now, { weekStartsOn: 1 });
+    const endDate = endOfWeek(now, { weekStartsOn: 1 });
+
+    const currentMonth = getMonth(now); // 0-11
+    const currentYear = getYear(now);
+
+    const { users } = await this.userRepository.findAllUsers();
+
+    for (const user of users) {
+      const leadsThisWeek = user.customers.filter((lead) => {
+        const createdAt = new Date(lead.created_at);
+        return createdAt >= startDate && createdAt <= endDate;
+      });
+
+      const countByStatus = {
+        total: leadsThisWeek.length,
+        desarrolloLeads: leadsThisWeek.filter(
+          (c) => c.type_of_client === 'Expansión de producto 🌱',
+        ).length,
+        recuperacionLeads: leadsThisWeek.filter(
+          (c) => c.type_of_client === 'Recuperación 🔄',
+        ).length,
+        newLeads: leadsThisWeek.filter(
+          (c) => c.type_of_client === 'Expansión de producto 🌱',
+        ).length,
+        reminderTotal: leadsThisWeek.reduce((sum, lead) => {
+          const validReminders = (lead.reminders || []).filter((reminder) => {
+            const reminderDate = new Date(reminder.reminder_date);
+            const isValidMonth = getMonth(reminderDate) === currentMonth;
+            const isValidYear = getYear(reminderDate) === currentYear;
+            const isCompleted = reminder.is_completed === true;
+            const isValidType = reminder.typeAppointment == 'Presencial'
+
+            return isValidMonth && isValidYear && isCompleted && isValidType;
+          });
+          return sum + validReminders.length;
+        }, 0),
+      };
+
+      const mailDto: MailProgressExecutiveDto = {
+        leadTotal: countByStatus.total,
+        desarrolloLeads: countByStatus.desarrolloLeads,
+        recuperacionLeads: countByStatus.recuperacionLeads,
+        newLeads: countByStatus.newLeads,
+        reminderTotal: countByStatus.reminderTotal,
+        userName: `${user.name} ${user.lastname}`,
+        email: user.email,
+        logoUrl: user.image || 'https://bbecbbde2b.imgdist.com/pub/bfra/zigpwtii/rtg/u0d/pw1/ChatGPT%20Image%2024%20may%202025%2C%2011_55_24.png',
+      };
+
+      await this.mailService.sendProgressExecutive(mailDto);
+    }
+
+    console.log('Se enviaron reportes semanales de ejecutivos');
+  }
 
   // Cron job para verificar las citas a las 9:30 AM
   @Cron(CronExpression.EVERY_DAY_AT_9AM, {
@@ -55,7 +121,7 @@ export class TaskService {
     console.log('Aquí se enviará el correo de notificación');
   }
 
- /*
+  /*
   // Cron job para enviar recordatorio un día antes de la cita
   @Cron(CronExpression.EVERY_DAY_AT_9AM, {
     name: 'citas un dia antes',
@@ -142,5 +208,4 @@ export class TaskService {
   }
 */
   // Cron job para enviar recordatorio una hora antes de la cita
-  
 }

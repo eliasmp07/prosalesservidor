@@ -90,7 +90,8 @@ const HTML_TEMPLATE_TODAY = (nombreCliente, fechaCita, horaCita, lugarCita, user
             </div>
             <div class="email-footer">
                 <p>CRM | Departamento de SAI | Propapel Mérida © 2025. Todos los derechos reservados.</p>
-                <p><a href="mailto:soportesai2@propapel.com">Contactar Soporte</a></p>
+                <p><a href="mailto:
+soportesai2@propapel.com">Contactar Soporte</a></p>
             </div>
         </div>
     </div>

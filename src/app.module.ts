@@ -25,6 +25,7 @@ import { LeadNotesModule } from './lead-notes/lead-notes.module';
 import { SocketModule } from './socket/socket.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
+import { UsersService } from './users/users.service';
 
 @Module({
   imports: [
@@ -61,6 +62,6 @@ import { MessageModule } from './message/message.module';
     MessageModule
   ],
   controllers: [AppController],
-  providers: [AppService, TaskService, MailService],
+  providers: [AppService, TaskService, MailService, UsersService],
 })
 export class AppModule {}
