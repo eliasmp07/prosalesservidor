@@ -44,20 +44,22 @@ export class ConversationService {
     };
   }
 
-  async findAllConversationByUserAdmin(userId: number) {
-    const conversationFound = await this.conversationRepository.find({
-      where: {
-        admins: {
-          id: userId,
-        },
-      },
-      relations: ['customer'],
-    });
+async findAllConversationByUserAdmin() {
+  const conversationsWithMessages = await this.conversationRepository
+    .createQueryBuilder('conversation')
+    .leftJoinAndSelect('conversation.customer', 'customer')
+    .leftJoinAndSelect('conversation.messages', 'messages')
+    .leftJoinAndSelect('messages.sender', 'sender') // Asegura que el sender de cada mensaje se cargue
+    .leftJoinAndSelect('conversation.ejecutivo', 'ejecutivo')
+    .leftJoinAndSelect('conversation.admins', 'admins')
+    .where('messages.id IS NOT NULL') // Solo conversaciones con al menos un mensaje
+    .getMany();
 
-    return {
-      conversations: conversationFound,
-    };
-  }
+  return {
+    conversations: conversationsWithMessages,
+  };
+}
+
 
   async findConversationById(id: number) {
     const conversationFound = await this.conversationRepository.findOne({
