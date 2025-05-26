@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Customer } from './entity/customer.entity';
-import { Like, Repository } from 'typeorm';
+import { Like, Not, Repository } from 'typeorm';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { User } from 'src/users/user.entity';
 import { Reminder } from 'src/remider/entity/remider.entity';
@@ -151,13 +151,6 @@ export class CustomersService {
       await this.remindersRepository.save(reminderEntities);
     }
 
-    const conversation = this.conversationRepository.create({
-      customer: customer,
-      ejecutivo: customer.user,
-    });
-
-    await this.conversationRepository.save(conversation);
-
     await this.leadHistoryRepository.save({
       customerId: customer.customer_id,
       action: LeadAction.CREATED,
@@ -182,7 +175,7 @@ export class CustomersService {
 
   async getMyCustomer(id: number) {
     const getMyCustomers = await this.customersRepository.find({
-      where: { user: { id } }, // Filtra por el id del usuario relacionado,
+      where: { user: { id },  managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),}, // Filtra por el id del usuario relacionado,
       relations: ['opportunities', 'interactions', 'purchases', 'reminders'],
     });
 
@@ -202,6 +195,7 @@ export class CustomersService {
         user: {
           email: Like('%@propapel.com.mx'),
         },
+         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: [
         'opportunities',
@@ -339,6 +333,7 @@ export class CustomersService {
           },
           email: Like('%@propapel.com.mx'),
         },
+         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: [
         'opportunities',
@@ -369,6 +364,7 @@ export class CustomersService {
         user: {
           email: Like('%@propapel.com.mx'),
         },
+         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: [
         'opportunities',
@@ -399,6 +395,7 @@ export class CustomersService {
         user: {
           email: Like('%@propapel.com.mx'),
         },
+         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: ['opportunities', 'interactions', 'purchases', 'reminders'],
     });
@@ -433,7 +430,7 @@ export class CustomersService {
    */
   async findByUserId(id: number) {
     const getMyCustomers = await this.customersRepository.find({
-      where: { user: { id } }, // Filtra por el id del usuario relacionado,
+      where: { user: { id },  managerReviewStatus: Not(ManagerReviewStatus.DISCARDED), }, // Filtra por el id del usuario relacionado,
       relations: [
         'opportunities',
         'interactions',
@@ -475,7 +472,7 @@ export class CustomersService {
 
   async findAllCustomerByUserId(id: number) {
     const getMyCustomers = await this.customersRepository.find({
-      where: { user: { id } }, // Filtra por el id del usuario relacionado,
+      where: { user: { id },  managerReviewStatus: Not(ManagerReviewStatus.DISCARDED), }, // Filtra por el id del usuario relacionado,
       relations: [
         'opportunities',
         'interactions',
@@ -501,6 +498,7 @@ export class CustomersService {
         user: {
           id: id,
         },
+         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
     });
 

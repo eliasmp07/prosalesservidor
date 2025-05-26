@@ -20,7 +20,7 @@ export class TaskService {
     return hour >= 0 && hour < 12 ? 'AM' : 'PM';
   }
 
-  @Cron(CronExpression.EVERY_WEEKEND, {
+  @Cron(CronExpression.EVERY_5_SECONDS, {
     name: 'citas antes es mero dia',
     timeZone: 'America/Mexico_City',
   }) // sábado a las 00:00
