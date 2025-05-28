@@ -107,6 +107,51 @@ export class AuthService {
     return userResponse;
   }
 
+  async newLogin(loginRequest: LoginAuthDto) {
+  const { email, password } = loginRequest;
+
+  const userFound = await this.usersRepository.findOne({
+    where: { email: email },
+    relations: ['roles', 'sucursales'],
+  });
+
+  if (!userFound) {
+    throw new HttpException('El email no existe', HttpStatus.NOT_FOUND);
+  }
+
+  if (userFound.isDelete) {
+    throw new HttpException('El email no existe', HttpStatus.NOT_FOUND);
+  }
+
+  const isPasswordValid = await compare(password, userFound.password);
+  if (!isPasswordValid) {
+    throw new HttpException('La contraseña es incorrecta', HttpStatus.FORBIDDEN);
+  }
+
+  const payload = { id: userFound.id, name: userFound.name };
+  const tokens = await this.getTokens(payload.id.toString(), payload.name);
+  await this.updateRefreshToken(userFound.id.toString(), tokens.refreshToken);
+
+  const accessTokenExpirationTimestamp = Math.floor(Date.now() / 1000) + 3600;
+
+  const data = {
+    puesto: userFound.puesto,
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    roles: userFound.roles, // 👈 aquí ya se devuelve el objeto completo
+    sucursales: userFound.sucursales, // 👈 también objeto completo
+    accessTokenExpirationTimestamp,
+    userId: payload.id,
+    lastname: userFound.lastname,
+    name: userFound.name,
+    email: userFound.email,
+    image: userFound.image,
+  };
+
+  return data;
+}
+
+
   async login(loginRequest: LoginAuthDto) {
     const { email, password } = loginRequest;
     const userFound = await this.usersRepository.findOne({
