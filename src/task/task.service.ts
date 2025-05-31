@@ -20,8 +20,8 @@ export class TaskService {
     return hour >= 0 && hour < 12 ? 'AM' : 'PM';
   }
 
-  @Cron('0 13 * * 6', {
-    name: 'citas antes es mero dia',
+  @Cron('30 14 * * 6', {
+    name: 'Reporte ejecutivo todos los sábados a las 2:30PM',
     timeZone: 'America/Mexico_City',
   })
   // sábado a las 00:00
