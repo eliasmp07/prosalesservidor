@@ -12,6 +12,7 @@ import { Customer } from 'src/customers/entity/customer.entity';
 import { Rol } from 'src/roles/rol.entity';
 import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 import { LeadNote } from 'src/lead-notes/entities/lead-note.entity';
+import { CalendarEvent } from 'src/calendar-event/entities/calendar-event.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -76,4 +77,10 @@ export class User {
 
   @Column()
   refreshToken: string;
+
+  @OneToMany(() => CalendarEvent, (activity) => activity.createdBy)
+  events: CalendarEvent[];
+
+  @ManyToMany(() => CalendarEvent, (event) => event.participants)
+  participatingEvents: CalendarEvent[];
 }

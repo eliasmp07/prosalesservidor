@@ -207,38 +207,6 @@ export class CustomersService {
       ],
     });
   }
-  /*
-  async categorizeLeads() {
-    const customers = await this.customersRepository.find({
-        relations: ['opportunities', 'interactions', 'purchases', 'reminders', 'projects']
-    });
-
-    // Categorías de clientes
-    const categorizedLeads = {
-        total: customers.length,
-        contactado: [],
-        interesado: [],
-        negociacion: [],
-        cerrado: []
-    };
-
-    customers.forEach((customer) => {
-        if (customer.progressLead === 100) {
-            categorizedLeads.cerrado.push(customer);
-        } else if (
-            customer.projects.some(project => project.status === 'En negociacion')
-        ) {
-            categorizedLeads.negociacion.push(customer);
-        } else if (customer.purchases && customer.purchases.length > 0) {
-            categorizedLeads.interesado.push(customer);
-        } else if (customer.interactions && customer.interactions.length > 0) {
-            categorizedLeads.contactado.push(customer);
-        }
-    });
-
-    return categorizedLeads;
-}
-*/
   async updateStatusLead(updateStatusCustomerDto: UpdateStatusCustomerDto) {
     const { customerId, status, userId, managerId } = updateStatusCustomerDto;
 

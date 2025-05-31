@@ -20,10 +20,11 @@ export class TaskService {
     return hour >= 0 && hour < 12 ? 'AM' : 'PM';
   }
 
-  @Cron(CronExpression.EVERY_5_SECONDS, {
+  @Cron('0 13 * * 6', {
     name: 'citas antes es mero dia',
     timeZone: 'America/Mexico_City',
-  }) // sábado a las 00:00
+  })
+  // sábado a las 00:00
   async handlerExecutivesEverySaturdayAt9AM() {
     const now = new Date();
     const startDate = startOfWeek(now, { weekStartsOn: 1 });
@@ -42,14 +43,14 @@ export class TaskService {
 
       const countByStatus = {
         total: leadsThisWeek.length,
-        desarrolloLeads: leadsThisWeek.filter(
-          (c) =>  c.type_of_client.includes("Expansión de producto"),
+        desarrolloLeads: leadsThisWeek.filter((c) =>
+          c.type_of_client.includes('Expansión de producto'),
         ).length,
-        recuperacionLeads: leadsThisWeek.filter(
-          (c) => c.type_of_client.includes("Recuperación"),
+        recuperacionLeads: leadsThisWeek.filter((c) =>
+          c.type_of_client.includes('Recuperación'),
         ).length,
-        newLeads: leadsThisWeek.filter(
-          (c) => c.type_of_client.includes("Nuevo"),
+        newLeads: leadsThisWeek.filter((c) =>
+          c.type_of_client.includes('Nuevo'),
         ).length,
         reminderTotal: leadsThisWeek.reduce((sum, lead) => {
           const validReminders = (lead.reminders || []).filter((reminder) => {
@@ -57,7 +58,7 @@ export class TaskService {
             const isValidMonth = getMonth(reminderDate) === currentMonth;
             const isValidYear = getYear(reminderDate) === currentYear;
             const isCompleted = reminder.is_completed === true;
-            const isValidType = reminder.typeAppointment == 'Presencial'
+            const isValidType = reminder.typeAppointment == 'Presencial';
 
             return isValidMonth && isValidYear && isCompleted && isValidType;
           });
@@ -73,7 +74,9 @@ export class TaskService {
         reminderTotal: countByStatus.reminderTotal,
         userName: `${user.name} ${user.lastname}`,
         email: user.email,
-        logoUrl: user.image || 'https://bbecbbde2b.imgdist.com/pub/bfra/zigpwtii/rtg/u0d/pw1/ChatGPT%20Image%2024%20may%202025%2C%2011_55_24.png',
+        logoUrl:
+          user.image ||
+          'https://bbecbbde2b.imgdist.com/pub/bfra/zigpwtii/rtg/u0d/pw1/ChatGPT%20Image%2024%20may%202025%2C%2011_55_24.png',
       };
 
       await this.mailService.sendProgressExecutive(mailDto);

@@ -26,6 +26,7 @@ import { SocketModule } from './socket/socket.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
 import { UsersService } from './users/users.service';
+import { CalendarEventModule } from './calendar-event/calendar-event.module';
 
 @Module({
   imports: [
@@ -59,7 +60,8 @@ import { UsersService } from './users/users.service';
     LeadNotesModule,
     SocketModule,
     ConversationModule,
-    MessageModule
+    MessageModule,
+    CalendarEventModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskService, MailService, UsersService],

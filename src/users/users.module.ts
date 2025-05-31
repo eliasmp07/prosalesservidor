@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { RefreshTokenStrategy } from 'src/auth/strategies/refreshToken.strategy';
 import { ConfigModule } from '@nestjs/config';
-import { AccessTokenStrategy } from 'src/auth/jwt.strategy';
+import { AccessTokenStrategy } from 'src/auth/strategies/jwt.strategy';
 import { CustomersController } from 'src/customers/customers.controller';
 import { CustomersService } from 'src/customers/customers.service';
 import { Customer } from 'src/customers/entity/customer.entity';
