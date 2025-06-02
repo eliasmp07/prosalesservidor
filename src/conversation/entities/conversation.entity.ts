@@ -19,22 +19,26 @@ export class Conversation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Customer, (customer) => customer.conversation)
-  @JoinColumn() // Necesario en el lado que poseerá la FK
+  @OneToOne(() => Customer, (customer) => customer.conversations)
+  @JoinColumn()
   customer: Customer;
 
-  @ManyToOne(() => User, { nullable: false,  eager: true  })
-  ejecutivo: User; // ejecutivo asignado
+  @ManyToOne(() => User, { nullable: false, eager: true })
+  ejecutivo: User; // Ejecutivo asignado al cliente
 
-  @ManyToMany(() => User, { eager: true })
-  @JoinTable()
-  admins: User[]; // administradores que pueden participar
+  @ManyToOne(() => User, { nullable: false, eager: true })
+  creator: User; // El que inicia la conversación (puede ser gerente o ejecutivo)
+
+  @ManyToOne(() => User, { nullable: false, eager: true })
+  participant: User; // El otro usuario (gerente o ejecutivo, depende del caso)
 
   @OneToMany(() => Message, (message) => message.conversation, {
-    cascade: true, eager: true 
+    cascade: true,
+    eager: true,
   })
   messages: Message[];
 
-  @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdAt: Date;
 }
+

@@ -55,7 +55,6 @@ export class MessageService {
       where: {
         id: createMessageDto.conversationId,
       },
-      relations: ['admins'],
     });
 
     const userFound = await this.userRepository.findOne({
@@ -63,19 +62,6 @@ export class MessageService {
         id: createMessageDto.userSenderId,
       },
     });
-
-    const allowedRoles = new Set(['gerente', 'gerente regional']);
-    const rol = createMessageDto.rolUser?.toLowerCase().trim();
-
-    if (
-      allowedRoles.has(rol) &&
-      !conversationFound.admins.some(
-        (admin) => admin.id.toString() === userFound.id.toString(),
-      )
-    ) {
-      conversationFound.admins.push(userFound);
-      await this.conversationRepository.save(conversationFound);
-    }
 
     const messageCreate = this.messageRepository.create({
       sender: userFound,

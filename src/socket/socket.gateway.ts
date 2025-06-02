@@ -79,6 +79,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Notificaciones: ${client.id}, data:`, data);
     this.server.emit('reading', { userId: data.userId });
   }
+
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @MessageBody() rawData: any,
@@ -210,6 +211,37 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.leave(`conversation-${conversationId}`);
      this.logger.log(
       `⛓️‍💥 Client ${client.id} left conversation ${conversationId}`,
+    );
+  }
+
+   
+  @SubscribeMessage('createEventCalendar')
+  async handleCreateEvent(
+    @ConnectedSocket() client: Socket,
+  ) {
+    
+    this.server.to(`eventCalendar`).emit('createdEventCalendar');
+  }
+
+  @SubscribeMessage('joinCalendarEvent')
+  handlerJoinCalendarEvent(
+    @ConnectedSocket() client: Socket,
+  ){
+    // Unir al socket a la sala de conversación
+    client.join(`eventCalendar`);
+
+    this.logger.log(
+      `✅ Cliente ${client.id} se ha unido al calendario`,
+    );
+  }
+
+   @SubscribeMessage('leaveCalendarEvent')
+  handleLeaveCalendarEvent(
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.leave(`eventCalendar`);
+     this.logger.log(
+      `⛓️‍💥 Client ${client.id} se ha salido de la sala de los eventos del calendario`,
     );
   }
 }

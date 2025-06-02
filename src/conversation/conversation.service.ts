@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { Conversation } from './entities/conversation.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { Customer } from 'src/customers/entity/customer.entity';
@@ -14,6 +14,8 @@ export class ConversationService {
     private conversationRepository: Repository<Conversation>,
     @InjectRepository(Customer)
     private customerRepository: Repository<Customer>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>
   ) {}
 
   async create(createConversationDto: CreateConversationDto) {
@@ -21,9 +23,17 @@ export class ConversationService {
       customer_id: createConversationDto.customerId,
     });
 
+    const participanFound = await this.userRepository.findOne({
+      where: {
+        id: createConversationDto.participantId
+      }
+    })
+
     const conversation = this.conversationRepository.create({
       customer: customerFound,
       ejecutivo: customerFound.user,
+      creator: customerFound.user,
+      participant: participanFound
     });
 
     return await this.conversationRepository.save(conversation);
@@ -51,7 +61,6 @@ async findAllConversationByUserAdmin() {
     .leftJoinAndSelect('conversation.messages', 'messages')
     .leftJoinAndSelect('messages.sender', 'sender') // Asegura que el sender de cada mensaje se cargue
     .leftJoinAndSelect('conversation.ejecutivo', 'ejecutivo')
-    .leftJoinAndSelect('conversation.admins', 'admins')
     .where('messages.id IS NOT NULL') // Solo conversaciones con al menos un mensaje
     .getMany();
 

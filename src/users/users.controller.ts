@@ -11,6 +11,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -39,10 +40,125 @@ export class UsersController {
     return this.usersService.findAllUserByBranch(id)
   }
 
+  @Get('findAllManagerSaleAndRegionalManager/:sucursalId')
+  findAllManagerSaleAndRegionalManager(@Param('sucursalId', ParseIntPipe) id: number) {
+    return this.usersService.findAllManagerSaleAndRegionalManager(id)
+  }
+  
+
   @Get('tableDates')
   findAllDatesUsersByMouth(){
     return this.usersService.findAllDatesNowByAllUsers()
   }
+  
+  @Get('findAppointments')
+async getDatesForMouthAndYear(
+  @Query('month') month?: string,
+  @Query('year') year?: string,
+): Promise<string> {
+  const now = new Date();
+  const selectedMonth = month ? parseInt(month) - 1 : now.getMonth();
+  const selectedYear = year ? parseInt(year) : now.getFullYear();
+
+  const data = await this.usersService.findAllDatesByMonthYear(
+    selectedMonth + 1,
+    selectedYear,
+  );
+
+  const rows = data
+    .map(
+      (item) =>
+        `<tr><td>${item.clave}</td><td>${item.saleExecutive}</td><td>${item.totalDates}</td></tr>`,
+    )
+    .join('\n');
+
+  const total = data.reduce((sum, item) => sum + item.totalDates, 0);
+
+  const currentDate = new Date(selectedYear, selectedMonth);
+
+  return `
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <title>Participación en Citas</title>
+      <style>
+        body { font-family: Arial; padding: 20px; background-color: #f7f9fc; }
+        header { background-color: #007BFF; color: white; padding: 20px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background: #0056b3; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .nav { text-align: center; margin: 20px 0; }
+        .nav button { padding: 10px 20px; margin: 0 10px; background: #007BFF; color: white; border: none; cursor: pointer; }
+      </style>
+    </head>
+    <body>
+      <header>
+        <h1>Participación en Citas</h1>
+        <p>${currentDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}</p>
+      </header>
+
+      <div class="nav">
+        <form id="navForm" method="GET">
+          <input type="hidden" name="month" id="month" value="${selectedMonth + 1}">
+          <input type="hidden" name="year" id="year" value="${selectedYear}">
+          <button type="button" onclick="changeMonth(-1)">← Anterior</button>
+          <button type="button" onclick="resetMonth()">Mes actual</button>
+          <button type="button" onclick="changeMonth(1)">Siguiente →</button>
+        </form>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>CLAVE</th>
+            <th>VENDEDOR</th>
+            <th>ASISTIDAS / MES</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">Total</td>
+            <td>${total}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <script>
+        function changeMonth(delta) {
+          const form = document.getElementById('navForm');
+          let month = parseInt(document.getElementById('month').value);
+          let year = parseInt(document.getElementById('year').value);
+
+          month += delta;
+          if (month < 1) {
+            month = 12;
+            year--;
+          } else if (month > 12) {
+            month = 1;
+            year++;
+          }
+
+          document.getElementById('month').value = month;
+          document.getElementById('year').value = year;
+          form.submit();
+        }
+
+        function resetMonth() {
+          const today = new Date();
+          document.getElementById('month').value = today.getMonth() + 1;
+          document.getElementById('year').value = today.getFullYear();
+          document.getElementById('navForm').submit();
+        }
+      </script>
+    </body>
+    </html>
+  `;
+}
 
   @Get('statusCitas')
 async getDates(): Promise<string> {

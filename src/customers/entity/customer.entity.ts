@@ -42,8 +42,8 @@ export class Customer {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.0 })
   progressLead: number;
 
-  @OneToOne(() => Conversation, (conversation) => conversation.customer)
-  conversation: Conversation;
+  @OneToMany(() => Conversation, (conversation) => conversation.customer)
+  conversations: Conversation[];
 
   @Column({
     type: 'enum',
@@ -83,7 +83,7 @@ export class Customer {
   @OneToMany(() => Purchase, (purchase) => purchase.customer)
   purchases: Purchase[];
 
-  @OneToMany(() => Reminder, (reminder) => reminder.customer)
+  @OneToMany(() => Reminder, (reminder) => reminder.customer, { eager: true })
   reminders: Reminder[];
 
   @Column({ type: 'datetime', default: () => 'CURRENT_TIMESTAMP' })

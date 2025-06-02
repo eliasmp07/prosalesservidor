@@ -93,6 +93,7 @@ export class MailService {
         alertReminder.time,
         alertReminder.direcction,
         alertReminder.user,
+        alertReminder.description
       ),
     };
 

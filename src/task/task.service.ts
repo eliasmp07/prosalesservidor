@@ -20,7 +20,7 @@ export class TaskService {
     return hour >= 0 && hour < 12 ? 'AM' : 'PM';
   }
 
-  @Cron('30 14 * * 6', {
+    @Cron('30 14 * * 6', {
     name: 'Reporte ejecutivo todos los sábados a las 2:30PM',
     timeZone: 'America/Mexico_City',
   })
@@ -30,17 +30,29 @@ export class TaskService {
     const startDate = startOfWeek(now, { weekStartsOn: 1 });
     const endDate = endOfWeek(now, { weekStartsOn: 1 });
 
-    const currentMonth = getMonth(now); // 0-11
-    const currentYear = getYear(now);
-
     const { users } = await this.userRepository.findAllUsers();
 
     for (const user of users) {
+      let totalDates = 0;
       const leadsThisWeek = user.customers.filter((lead) => {
         const createdAt = new Date(lead.created_at);
         return createdAt >= startDate && createdAt <= endDate;
       });
+      const reminderTotalThisMouth = user.customers.flatMap((customer) => customer.reminders ?? []);
 
+      for (const reminder of reminderTotalThisMouth) {
+        const timestamp: number = Number(reminder.reminder_date);
+        const dateUTC = new Date(timestamp).toISOString();
+        const reminderDate = new Date(dateUTC);
+        if (
+          reminder.is_completed &&
+          reminderDate.getUTCFullYear() === now.getUTCFullYear() &&
+          reminderDate.getUTCMonth() === now.getUTCMonth() &&
+          this.isAppointmentTypeValid(reminder.typeAppointment)
+        ) {
+          totalDates++;
+        }
+      }
       const countByStatus = {
         total: leadsThisWeek.length,
         desarrolloLeads: leadsThisWeek.filter((c) =>
@@ -52,18 +64,7 @@ export class TaskService {
         newLeads: leadsThisWeek.filter((c) =>
           c.type_of_client.includes('Nuevo'),
         ).length,
-        reminderTotal: leadsThisWeek.reduce((sum, lead) => {
-          const validReminders = (lead.reminders || []).filter((reminder) => {
-            const reminderDate = new Date(reminder.reminder_date);
-            const isValidMonth = getMonth(reminderDate) === currentMonth;
-            const isValidYear = getYear(reminderDate) === currentYear;
-            const isCompleted = reminder.is_completed === true;
-            const isValidType = reminder.typeAppointment == 'Presencial';
-
-            return isValidMonth && isValidYear && isCompleted && isValidType;
-          });
-          return sum + validReminders.length;
-        }, 0),
+        reminderTotal: totalDates,
       };
 
       const mailDto: MailProgressExecutiveDto = {
@@ -109,6 +110,7 @@ export class TaskService {
         const alertReminder: alertReminderDto = {
           user: reminder.customer.user.name,
           client: reminder.customer.company_name,
+          description: reminder.description,
           // Hora en formato UTC
           time: `${reminderDate.getUTCHours().toString().padStart(2, '0')}:${reminderDate.getUTCMinutes().toString().padStart(2, '0')} ${this.formatAMAndPM(reminderDate.getUTCHours())}`,
           email: reminder.customer.user.email,
@@ -211,4 +213,9 @@ export class TaskService {
   }
 */
   // Cron job para enviar recordatorio una hora antes de la cita
+
+  private isAppointmentTypeValid(type: string): boolean {
+    const validTypes = ['Presencial', 'Reunion Remota']; // ejemplo
+    return validTypes.includes(type);
+  }
 }

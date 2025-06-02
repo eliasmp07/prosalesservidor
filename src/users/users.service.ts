@@ -47,7 +47,9 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
-        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
+        'customers.conversation',
+        'customers.conversation.messages',
+        'customers.conversation.customer',
       ],
     });
 
@@ -68,8 +70,9 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
-        'customers.conversation', 
-        'customers.conversation.messages', 'customers.conversation.customer'
+        'customers.conversation',
+        'customers.conversation.messages',
+        'customers.conversation.customer',
       ],
     });
 
@@ -90,7 +93,9 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
-        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
+        'customers.conversation',
+        'customers.conversation.messages',
+        'customers.conversation.customer',
       ],
     });
     return user;
@@ -106,7 +111,9 @@ export class UsersService {
         'sucursales',
         'roles',
         'customers',
-        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer',
+        'customers.conversation',
+        'customers.conversation.messages',
+        'customers.conversation.customer',
         'customers.interactions',
         'customers.purchases',
         'customers.reminders',
@@ -130,8 +137,10 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
-        'customers.conversation', 
-        'customers.conversation.messages',, 'customers.conversation.customer'
+        'customers.conversation',
+        'customers.conversation.messages',
+        ,
+        'customers.conversation.customer',
       ],
     });
 
@@ -351,7 +360,9 @@ export class UsersService {
         'customers',
         'customers.notes',
         'customers.interactions',
-        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer',
+        'customers.conversation',
+        'customers.conversation.messages',
+        'customers.conversation.customer',
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
@@ -380,7 +391,9 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
-        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
+        'customers.conversation',
+        'customers.conversation.messages',
+        'customers.conversation.customer',
       ],
     });
 
@@ -401,6 +414,34 @@ export class UsersService {
     };
 
     return usersBySucursal;
+  }
+  async findAllManagerSaleAndRegionalManager(sucursalId: number) {
+    const usersFound = await this.usersRepository.find({
+      where: [
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('2') },
+          email: Like('%@propapel.com.mx'),
+        },
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('2') },
+          email: Like('%@optivosa.com'),
+        },
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('3') },
+          email: Like('%@propapel.com.mx'),
+        },
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('3') },
+          email: Like('%@optivosa.com'),
+        },
+      ],
+    });
+
+    return usersFound;
   }
 
   /**
@@ -429,7 +470,9 @@ export class UsersService {
         'customers.purchases',
         'customers.reminders',
         'customers.projects',
-        'customers.conversation', 'customers.conversation.messages', 'customers.conversation.customer'
+        'customers.conversation',
+        'customers.conversation.messages',
+        'customers.conversation.customer',
       ],
     });
 
@@ -450,7 +493,7 @@ export class UsersService {
         { email: Like('%@optivosa.com') },
         { email: Like('%@propapel.com.mx') },
       ],
-      relations: ['sucursales', 'customers', 'customers.reminders',],
+      relations: ['sucursales', 'customers', 'customers.reminders'],
     });
 
     const results: InfoTableDatesDto[] = [];
@@ -466,14 +509,14 @@ export class UsersService {
           const dateUTC = new Date(timestamp).toISOString();
           const reminderDate = new Date(dateUTC);
 
-            if (
-              reminder.is_completed && reminderDate.getUTCFullYear() === today.getUTCFullYear() &&
-              reminderDate.getUTCMonth() === today.getUTCMonth() &&
-              this.isAppointmentTypeValid(reminder.typeAppointment)
-            ) {
-              totalDates++;
-            }
-      
+          if (
+            reminder.is_completed &&
+            reminderDate.getUTCFullYear() === today.getUTCFullYear() &&
+            reminderDate.getUTCMonth() === today.getUTCMonth() &&
+            this.isAppointmentTypeValid(reminder.typeAppointment)
+          ) {
+            totalDates++;
+          }
         }
       }
 
@@ -489,31 +532,76 @@ export class UsersService {
     return results;
   }
 
-  private detectWalletByUser(id: number): string {
-    const walletMap: Record<number, string> = {
-      43: "P065",
-      36: "359",
-      46: "P419",
-      51: "P470",
-      47: "P471",
-      45: "P501",
-      27: "520",
-      44: "P595",
-      28: "P596",
-      29: "P21",
-      38: "P52",
-      26: "P53",
-    };
-  
-    return walletMap[id] ?? "";
-  }
-  
   private isAppointmentTypeValid(type: string): boolean {
     const validTypes = ['Presencial', 'Reunion Remota']; // ejemplo
     return validTypes.includes(type);
   }
 
-  
+  private detectWalletByUser(id: number): string {
+    const walletMap: Record<number, string> = {
+      43: 'P065',
+      36: '359',
+      46: 'P419',
+      51: 'P470',
+      47: 'P471',
+      45: 'P501',
+      27: '520',
+      44: 'P595',
+      28: 'P596',
+      29: 'P21',
+      38: 'P52',
+      26: 'P53',
+    };
+
+    return walletMap[id] ?? '';
+  }
+
+  async findAllDatesByMonthYear(
+    month: number,
+    year: number,
+  ): Promise<InfoTableDatesDto[]> {
+    const users = await this.usersRepository.find({
+      where: [
+        { email: Like('%@optivosa.com') },
+        { email: Like('%@propapel.com.mx') },
+      ],
+      relations: ['sucursales', 'customers', 'customers.reminders'],
+    });
+
+    const results: InfoTableDatesDto[] = [];
+
+    for (const user of users) {
+      const saleExecutive = `${user.name} ${user.lastname}`;
+      const clave = this.detectWalletByUser(user.id) || 'Sin clave';
+      let totalDates = 0;
+
+      for (const customer of user.customers || []) {
+        for (const reminder of customer.reminders || []) {
+          const timestamp: number = Number(reminder.reminder_date);
+          const reminderDate = new Date(timestamp);
+
+          if (
+            reminder.is_completed &&
+            reminderDate.getUTCFullYear() === year &&
+            reminderDate.getUTCMonth() === month - 1 && // OJO: getUTCMonth() es base 0 (enero = 0)
+            this.isAppointmentTypeValid(reminder.typeAppointment)
+          ) {
+            totalDates++;
+          }
+        }
+      }
+
+      if (totalDates > 0) {
+        results.push({
+          saleExecutive,
+          clave,
+          totalDates,
+        });
+      }
+    }
+
+    return results;
+  }
 }
 
 export class InfoTableDatesDto {
