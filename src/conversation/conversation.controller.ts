@@ -35,7 +35,7 @@ export class ConversationController {
 
   @Get('findAllConversationByUserAdminId/:id')
   findAllConversationByUserAdminId(@Param('id', ParseIntPipe) id: number){
-    return this.conversationService.findAllConversationByUserAdmin()
+    return this.conversationService.finAllConversationsByManager(id)
   }
 
   @Get('findConversationById/:id')

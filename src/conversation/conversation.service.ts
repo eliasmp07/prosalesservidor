@@ -15,7 +15,7 @@ export class ConversationService {
     @InjectRepository(Customer)
     private customerRepository: Repository<Customer>,
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
   ) {}
 
   async create(createConversationDto: CreateConversationDto) {
@@ -25,15 +25,15 @@ export class ConversationService {
 
     const participanFound = await this.userRepository.findOne({
       where: {
-        id: createConversationDto.participantId
-      }
-    })
+        id: createConversationDto.participantId,
+      },
+    });
 
     const conversation = this.conversationRepository.create({
       customer: customerFound,
       ejecutivo: customerFound.user,
       creator: customerFound.user,
-      participant: participanFound
+      participant: participanFound,
     });
 
     return await this.conversationRepository.save(conversation);
@@ -54,24 +54,23 @@ export class ConversationService {
     };
   }
 
-async findAllConversationByUserAdmin() {
-  const conversationsWithMessages = await this.conversationRepository
-    .createQueryBuilder('conversation')
-    .leftJoinAndSelect('conversation.customer', 'customer')
-    .leftJoinAndSelect('conversation.messages', 'messages')
-    .leftJoinAndSelect('messages.sender', 'sender') // Asegura que el sender de cada mensaje se cargue
-    .leftJoinAndSelect('conversation.ejecutivo', 'ejecutivo')
-    .where('messages.id IS NOT NULL') // Solo conversaciones con al menos un mensaje
-    .getMany();
+  async finAllConversationsByManager(userId: number) {
+    const conversationFound = await this.conversationRepository.find({
+      where: {
+        participant: {
+          id: userId
+        }
+      },
+      relations: ['customer'],
+    });
 
-  return {
-    conversations: conversationsWithMessages,
-  };
-}
-
+    return {
+      conversations: conversationFound,
+    };
+  }
 
   async findConversationById(id: number) {
-    const conversationFound = await this.conversationRepository.findOne({
+    const conversationFound = await this.conversationRepository.find({
       where: {
         customer: {
           customer_id: id,

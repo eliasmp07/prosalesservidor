@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { ProspectingReason } from '../enum/prospecting_reason';
 import { CalendarEventStatus } from '../enum/calendar_event_status';
+import { Sucursales } from 'src/sucursales/entities/sucursale.entity';
 
 @Entity()
 export class CalendarEvent {
@@ -46,6 +47,11 @@ export class CalendarEvent {
   @Column({ type: 'timestamp', nullable: true })
   endTime?: Date;
 
+  @ManyToOne(() => Sucursales, (sucursal) => sucursal.calendarEvents, {
+    eager: true,
+  })
+  sucursal: Sucursales;
+
   @Column({ nullable: true })
   location?: string;
 
@@ -73,4 +79,7 @@ export class CalendarEvent {
     cascade: true,
   })
   reminders: Reminder[];
+
+  @Column({ default: false })
+  isDelete: boolean;
 }

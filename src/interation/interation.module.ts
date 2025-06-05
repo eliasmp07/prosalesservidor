@@ -24,6 +24,7 @@ import { SucursalesModule } from 'src/sucursales/sucursales.module';
 import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
 import { MailService } from 'src/auth/service/MailService';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { CalendarEvent } from 'src/calendar-event/entities/calendar-event.entity';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { Conversation } from 'src/conversation/entities/conversation.entity';
        Conversation,
       Opportunity,
       Interaction,
+      CalendarEvent,
       Purchase,
       Reminder,
       LeadHistory,

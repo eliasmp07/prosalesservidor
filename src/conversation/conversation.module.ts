@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { User } from 'src/users/user.entity';
 import { Customer } from 'src/customers/entity/customer.entity';
 import { Conversation } from './entities/conversation.entity';
+import { CalendarEvent } from 'src/calendar-event/entities/calendar-event.entity';
 
 @Module({
    imports: [
@@ -14,7 +15,8 @@ import { Conversation } from './entities/conversation.entity';
          Message,
          User,
          Conversation,
-         Customer
+         Customer,
+         CalendarEvent
       ]),
       ConfigModule, // Importa ConfigModule aquí
     ],

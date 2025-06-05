@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCalendarEventDto } from './dto/create-calendar-event.dto';
 import { UpdateCalendarEventDto } from './dto/update-calendar-event.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/users/user.entity';
 import { ProspectingReason } from './enum/prospecting_reason';
 import { CalendarEventStatus } from './enum/calendar_event_status';
+import { number } from 'joi';
 
 @Injectable()
 export class CalendarEventService {
@@ -19,6 +20,9 @@ export class CalendarEventService {
   async create(createCalendarEventDto: CreateCalendarEventDto) {
     const userCreateEvent = await this.userRepository.findOne({
       where: { id: createCalendarEventDto.createByUser },
+      relations: [
+         'sucursales',
+      ]
     });
 
     if (!userCreateEvent) {
@@ -61,31 +65,106 @@ export class CalendarEventService {
       notes: createCalendarEventDto.notes,
       createdBy: userCreateEvent, // este también estaba mal escrito antes como createByUser
       participants: participants,
+      sucursal: userCreateEvent.sucursales[0]
     });
 
     return await this.calendarEventRepository.save(newEvent);
   }
 
   async findAll() {
-  return await this.calendarEventRepository.find({
-    relations: ['createdBy', 'participants'],
-    order: {
-      activityDate: 'DESC',
-      startTime: 'DESC',
-    },
-  });
-}
+    return await this.calendarEventRepository.find({
+      where: {
+         isDelete: false 
+      },
+      relations: ['createdBy', 'participants', 'reminders'],
+      order: {
+        activityDate: 'DESC',
+        startTime: 'DESC',
+      },
+    });
+  }
 
+   async findByCreator(id:number) {
+    return await this.calendarEventRepository.find({
+      where: {
+         isDelete: false ,
+         createdBy: {
+          id : id
+         }
+      },
+      relations: ['createdBy', 'participants'],
+      order: {
+        activityDate: 'DESC',
+        startTime: 'DESC',
+      },
+    });
+  }
+
+  async update(id: number, updateDto: UpdateCalendarEventDto) {
+    const event = await this.calendarEventRepository.findOne({
+      where: { id },
+      relations: ['participants', 'createdBy'],
+    });
+
+    if (!event) {
+      throw new Error(`CalendarEvent with id ${id} not found`);
+    }
+
+    // Actualizar campos directos si están presentes
+    if (updateDto.title !== undefined) event.title = updateDto.title;
+    if (updateDto.description !== undefined)
+      event.description = updateDto.description;
+    if (updateDto.status !== undefined)
+      event.status = updateDto.status as CalendarEventStatus;
+    if (updateDto.prospeccionReason !== undefined)
+      event.prospectingReason =
+        updateDto.prospeccionReason as ProspectingReason;
+    if (updateDto.activityDate !== undefined)
+      event.activityDate = new Date(updateDto.activityDate);
+    if (updateDto.startTime !== undefined)
+      event.startTime = new Date(updateDto.startTime);
+    if (updateDto.endTime !== undefined)
+      event.endTime = new Date(updateDto.endTime);
+    if (updateDto.location !== undefined) event.location = updateDto.location;
+    if (updateDto.notes !== undefined) event.notes = updateDto.notes;
+    event.updatedAt = new Date();
+
+    // Si se quieren actualizar los participantes
+    if (updateDto.participants) {
+      const newParticipants: User[] = [];
+
+      for (const participantId of updateDto.participants) {
+        const user = await this.userRepository.findOne({
+          where: { id: participantId },
+        });
+        if (user) {
+          newParticipants.push(user);
+        }
+      }
+
+      event.participants = newParticipants;
+    }
+
+    return await this.calendarEventRepository.save(event);
+  }
 
   findOne(id: number) {
     return `This action returns a #${id} calendarEvent`;
   }
 
-  update(id: number, updateCalendarEventDto: UpdateCalendarEventDto) {
-    return `This action updates a #${id} calendarEvent`;
-  }
+  async remove(id: number): Promise<void> {
+    const eventFound = await this.calendarEventRepository.findOne({
+      where: { id },
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} calendarEvent`;
+    if (!eventFound) {
+      throw new HttpException(
+        'Conversation with id ${id} not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    eventFound.isDelete = true;
+    await this.calendarEventRepository.save(eventFound);
   }
 }

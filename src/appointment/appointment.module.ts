@@ -27,13 +27,14 @@ import { RolesModule } from 'src/roles/roles.module';
 import { LeadHistory } from 'src/lead-history/entities/lead-history.entity';
 import { MailService } from 'src/auth/service/MailService';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { CalendarEvent } from 'src/calendar-event/entities/calendar-event.entity';
 
 @Module({
   imports: [
      RolesModule,
         SucursalesModule,
     TypeOrmModule.forFeature([
-      Customer, Appointment, Reminder, Opportunity, Interaction, Purchase, User, LeadHistory,  Conversation
+      Customer, Appointment, Reminder, Opportunity, Interaction, Purchase, User, LeadHistory,  Conversation, CalendarEvent
     ]),
     ConfigModule
   ],

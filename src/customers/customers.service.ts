@@ -17,6 +17,7 @@ import { ManagerReviewStatus } from 'src/enums/lead_manager_review';
 import { MailService } from 'src/auth/service/MailService';
 import { NotifityAlertAssignedCustomer } from 'src/auth/service/notifityAlertAssignedCustomer.dto';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { CalendarEvent } from 'src/calendar-event/entities/calendar-event.entity';
 
 @Injectable()
 export class CustomersService {
@@ -37,6 +38,8 @@ export class CustomersService {
     private leadHistoryRepository: Repository<LeadHistory>,
     @InjectRepository(Conversation)
     private conversationRepository: Repository<Conversation>,
+    @InjectRepository(CalendarEvent)
+    private calendarEventRepository: Repository<CalendarEvent>,
   ) {}
 
   async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
@@ -140,15 +143,97 @@ export class CustomersService {
       await this.purchasesRepository.save(purchaseEntities);
     }
 
-    // Crear los recordatorios relacionados (si se proporcionaron)
-    if (reminders) {
-      const reminderEntities = reminders.map((reminderDto) => {
-        return this.remindersRepository.create({
+    if (interactions) {
+      const userEvents = await this.calendarEventRepository.find({
+        where: { createdBy: { id: user.id } },
+        relations: ['reminders'],
+      });
+
+      for (const reminderDto of interactions) {
+        const reminderDate = new Date(reminderDto.reminder_date);
+
+        // Crear el reminder con su customer
+        const reminder = this.remindersRepository.create({
           ...reminderDto,
           customer,
         });
+
+        // Buscar evento con misma fecha
+        const matchingEvent = userEvents.find((event) => {
+          const activityDate = new Date(event.activityDate);
+          return (
+            activityDate.getFullYear() === reminderDate.getFullYear() &&
+            activityDate.getMonth() === reminderDate.getMonth() &&
+            activityDate.getDay() === reminderDate.getDay()
+          );
+        });
+
+        // Guardar el reminder primero
+        const savedReminder = await this.remindersRepository.save(reminder);
+
+        if (matchingEvent) {
+          // Asegúrate que reminders esté inicializado
+          if (!matchingEvent.reminders) {
+            matchingEvent.reminders = [];
+          }
+
+          // Asocia el reminder al evento
+          matchingEvent.reminders.push(savedReminder);
+
+          // Ahora guarda el evento con su nuevo reminder relacionado
+          await this.calendarEventRepository.save(matchingEvent);
+        }
+      }
+    }
+
+    // Crear los recordatorios relacionados (si se proporcionaron)
+    if (reminders) {
+      const userEvents = await this.calendarEventRepository.find({
+        where: { createdBy: { id: user.id } },
+        relations: ['reminders'],
       });
-      await this.remindersRepository.save(reminderEntities);
+
+      for (const reminderDto of reminders) {
+        const timestamp: number = Number(reminderDto.reminder_date);
+        const dateUTC = new Date(timestamp).toISOString();
+        const reminderDate = new Date(dateUTC);
+
+        console.log(userEvents);
+        console.log(reminderDto);
+        // Crear el reminder con su customer
+        const reminder = this.remindersRepository.create({
+          ...reminderDto,
+          customer,
+        });
+
+        // Buscar evento con misma fecha
+        const matchingEvent = userEvents.find((event) => {
+          const activityDate = new Date(event.activityDate);
+          console.log(event.id)
+          console.log(activityDate)
+           console.log('Este es la fecha del reminder')
+          console.log(reminderDate)
+          return (
+            activityDate.getFullYear() === reminderDate.getFullYear() &&
+            activityDate.getMonth() === reminderDate.getMonth() &&
+            activityDate.getDay() === reminderDate.getDay()
+          );
+        });
+
+        console.log(matchingEvent)
+
+        // Guardar el reminder primero
+        const savedReminder = await this.remindersRepository.save(reminder);
+
+        if (matchingEvent) {
+        
+          // Asocia el reminder al evento
+          matchingEvent.reminders.push(savedReminder);
+
+          // Ahora guarda el evento con su nuevo reminder relacionado
+          await this.calendarEventRepository.save(matchingEvent);
+        }
+      }
     }
 
     await this.leadHistoryRepository.save({
@@ -175,7 +260,10 @@ export class CustomersService {
 
   async getMyCustomer(id: number) {
     const getMyCustomers = await this.customersRepository.find({
-      where: { user: { id },  managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),}, // Filtra por el id del usuario relacionado,
+      where: {
+        user: { id },
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+      }, // Filtra por el id del usuario relacionado,
       relations: ['opportunities', 'interactions', 'purchases', 'reminders'],
     });
 
@@ -195,7 +283,7 @@ export class CustomersService {
         user: {
           email: Like('%@propapel.com.mx'),
         },
-         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: [
         'opportunities',
@@ -301,7 +389,7 @@ export class CustomersService {
           },
           email: Like('%@propapel.com.mx'),
         },
-         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: [
         'opportunities',
@@ -314,10 +402,10 @@ export class CustomersService {
 
     const funnelData = {
       prospectos: customers.length,
-      contactados: customers.filter((c) => c.status == LeadStatus.CONTACTED).length,
-      interesados: customers.filter(
-        (c) =>  c.status == LeadStatus.INTERESTED,
-      ).length,
+      contactados: customers.filter((c) => c.status == LeadStatus.CONTACTED)
+        .length,
+      interesados: customers.filter((c) => c.status == LeadStatus.INTERESTED)
+        .length,
       negociacion: customers.filter(
         (c) => c.status == LeadStatus.NEGOTIATION, //c.projects.some((p) => p.status === 'En negociacion'),
       ).length,
@@ -332,7 +420,7 @@ export class CustomersService {
         user: {
           email: Like('%@propapel.com.mx'),
         },
-         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: [
         'opportunities',
@@ -343,12 +431,12 @@ export class CustomersService {
       ],
     });
 
-     const funnelData = {
+    const funnelData = {
       prospectos: customers.length,
-      contactados: customers.filter((c) => c.status == LeadStatus.CONTACTED).length,
-      interesados: customers.filter(
-        (c) =>  c.status == LeadStatus.INTERESTED,
-      ).length,
+      contactados: customers.filter((c) => c.status == LeadStatus.CONTACTED)
+        .length,
+      interesados: customers.filter((c) => c.status == LeadStatus.INTERESTED)
+        .length,
       negociacion: customers.filter(
         (c) => c.status == LeadStatus.NEGOTIATION, //c.projects.some((p) => p.status === 'En negociacion'),
       ).length,
@@ -363,7 +451,7 @@ export class CustomersService {
         user: {
           email: Like('%@propapel.com.mx'),
         },
-         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
       relations: ['opportunities', 'interactions', 'purchases', 'reminders'],
     });
@@ -398,7 +486,10 @@ export class CustomersService {
    */
   async findByUserId(id: number) {
     const getMyCustomers = await this.customersRepository.find({
-      where: { user: { id },  managerReviewStatus: Not(ManagerReviewStatus.DISCARDED), }, // Filtra por el id del usuario relacionado,
+      where: {
+        user: { id },
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+      }, // Filtra por el id del usuario relacionado,
       relations: [
         'opportunities',
         'interactions',
@@ -440,7 +531,10 @@ export class CustomersService {
 
   async findAllCustomerByUserId(id: number) {
     const getMyCustomers = await this.customersRepository.find({
-      where: { user: { id },  managerReviewStatus: Not(ManagerReviewStatus.DISCARDED), }, // Filtra por el id del usuario relacionado,
+      where: {
+        user: { id },
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+      }, // Filtra por el id del usuario relacionado,
       relations: [
         'opportunities',
         'interactions',
@@ -466,19 +560,20 @@ export class CustomersService {
         user: {
           id: id,
         },
-         managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
+        managerReviewStatus: Not(ManagerReviewStatus.DISCARDED),
       },
     });
 
     const data = {
       all: customersFound.length,
-      news: customersFound.filter((c) => c.type_of_client.includes("Nuevo")).length,
-      recovery: customersFound.filter(
-        (c) =>  c.type_of_client.includes("Recuperación")
+      news: customersFound.filter((c) => c.type_of_client.includes('Nuevo'))
+        .length,
+      recovery: customersFound.filter((c) =>
+        c.type_of_client.includes('Recuperación'),
       ).length,
       developer: customersFound.filter(
-        (c) =>  c.type_of_client.includes("Expansión de producto"), //c.projects.some((p) => p.status === 'En negociacion'),
-      ).length
+        (c) => c.type_of_client.includes('Expansión de producto'), //c.projects.some((p) => p.status === 'En negociacion'),
+      ).length,
     };
 
     return data;

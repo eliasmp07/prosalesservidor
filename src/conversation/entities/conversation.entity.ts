@@ -19,7 +19,7 @@ export class Conversation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Customer, (customer) => customer.conversations)
+  @ManyToOne(() => Customer, (customer) => customer.conversations)
   @JoinColumn()
   customer: Customer;
 
@@ -41,4 +41,3 @@ export class Conversation {
   @CreateDateColumn()
   createdAt: Date;
 }
-
