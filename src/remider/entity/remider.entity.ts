@@ -14,6 +14,9 @@ export class Reminder {
   @Column()
   typeAppointment: string;
 
+  @Column({default: false})
+  isProspectingCold: boolean;
+
   @Column({ type: 'bigint' })
   reminder_date: number;
 
