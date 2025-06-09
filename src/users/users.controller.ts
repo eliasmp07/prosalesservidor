@@ -34,49 +34,60 @@ export class UsersController {
   //@UseGuards(JwtAuthGuard)
 
   //NEW VERSION GET INFO
+  
+  @Get('findAllUsersBranches')
+  findAllUsersBranches() {
+    return this.usersService.findAllUsersBranches();
+  }
+
+   @Get('findUsersByBranch/:sucursalId')
+  findUsersByBranch(@Param('sucursalId', ParseIntPipe) id: number) {
+    return this.usersService.findAllUsesByBranch(id);
+  }
 
   @Get('findAllUserByBranch/:sucursalId')
   findAllUserBySucursal(@Param('sucursalId', ParseIntPipe) id: number) {
-    return this.usersService.findAllUserByBranch(id)
+    return this.usersService.findAllUserByBranch(id);
   }
 
   @Get('findAllManagerSaleAndRegionalManager/:sucursalId')
-  findAllManagerSaleAndRegionalManager(@Param('sucursalId', ParseIntPipe) id: number) {
-    return this.usersService.findAllManagerSaleAndRegionalManager(id)
+  findAllManagerSaleAndRegionalManager(
+    @Param('sucursalId', ParseIntPipe) id: number,
+  ) {
+    return this.usersService.findAllManagerSaleAndRegionalManager(id);
   }
-  
 
   @Get('tableDates')
-  findAllDatesUsersByMouth(){
-    return this.usersService.findAllDatesNowByAllUsers()
+  findAllDatesUsersByMouth() {
+    return this.usersService.findAllDatesNowByAllUsers();
   }
-  
+
   @Get('findAppointments')
-async getDatesForMouthAndYear(
-  @Query('month') month?: string,
-  @Query('year') year?: string,
-): Promise<string> {
-  const now = new Date();
-  const selectedMonth = month ? parseInt(month) - 1 : now.getMonth();
-  const selectedYear = year ? parseInt(year) : now.getFullYear();
+  async getDatesForMouthAndYear(
+    @Query('month') month?: string,
+    @Query('year') year?: string,
+  ): Promise<string> {
+    const now = new Date();
+    const selectedMonth = month ? parseInt(month) - 1 : now.getMonth();
+    const selectedYear = year ? parseInt(year) : now.getFullYear();
 
-  const data = await this.usersService.findAllDatesByMonthYear(
-    selectedMonth + 1,
-    selectedYear,
-  );
+    const data = await this.usersService.findAllDatesByMonthYear(
+      selectedMonth + 1,
+      selectedYear,
+    );
 
-  const rows = data
-    .map(
-      (item) =>
-        `<tr><td>${item.clave}</td><td>${item.saleExecutive}</td><td>${item.totalDates}</td></tr>`,
-    )
-    .join('\n');
+    const rows = data
+      .map(
+        (item) =>
+          `<tr><td>${item.clave}</td><td>${item.saleExecutive}</td><td>${item.totalDates}</td></tr>`,
+      )
+      .join('\n');
 
-  const total = data.reduce((sum, item) => sum + item.totalDates, 0);
+    const total = data.reduce((sum, item) => sum + item.totalDates, 0);
 
-  const currentDate = new Date(selectedYear, selectedMonth);
+    const currentDate = new Date(selectedYear, selectedMonth);
 
-  return `
+    return `
     <!DOCTYPE html>
     <html lang="es">
     <head>
@@ -158,21 +169,24 @@ async getDatesForMouthAndYear(
     </body>
     </html>
   `;
-}
+  }
 
   @Get('statusCitas')
-async getDates(): Promise<string> {
-  const data = await this.usersService.findAllDatesNowByAllUsers();
+  async getDates(): Promise<string> {
+    const data = await this.usersService.findAllDatesNowByAllUsers();
 
-  const rows = data.map(
-    (item) => `<tr><td>${item.clave}</td><td>${item.saleExecutive}</td><td>${item.totalDates}</td></tr>`
-  ).join('\n');
+    const rows = data
+      .map(
+        (item) =>
+          `<tr><td>${item.clave}</td><td>${item.saleExecutive}</td><td>${item.totalDates}</td></tr>`,
+      )
+      .join('\n');
 
-  const today = new Date();
+    const today = new Date();
 
-  const total = data.reduce((sum, item) => sum + item.totalDates, 0);
+    const total = data.reduce((sum, item) => sum + item.totalDates, 0);
 
-  return `
+    return `
     <!DOCTYPE html>
     <html lang="es">
     <head>
@@ -255,16 +269,15 @@ async getDates(): Promise<string> {
     </body>
     </html>
   `;
-}
-
+  }
 
   @Put('updateInfo')
-  updateInfoUser( @Body() UpdateInfoUserDto: UpdateInfoUserDto){
-    return this.usersService.updateInfoUser(UpdateInfoUserDto)
+  updateInfoUser(@Body() UpdateInfoUserDto: UpdateInfoUserDto) {
+    return this.usersService.updateInfoUser(UpdateInfoUserDto);
   }
 
   @Get('findByAllUsers')
-  findByAllUsers(){
+  findByAllUsers() {
     return this.usersService.findBYAllUsers();
   }
 
@@ -285,7 +298,7 @@ async getDates(): Promise<string> {
 
   @Get('getUserBySucursal/:sucursalId')
   findUserBySucursal(@Param('sucursalId', ParseIntPipe) id: number) {
-    return this.usersService.findAllUserBySucursale(id)
+    return this.usersService.findAllUserBySucursale(id);
   }
 
   @Get('getUserById/:Id')

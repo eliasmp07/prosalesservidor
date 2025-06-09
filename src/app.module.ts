@@ -27,6 +27,7 @@ import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
 import { UsersService } from './users/users.service';
 import { CalendarEventModule } from './calendar-event/calendar-event.module';
+import { ChatgptModule } from './chatgpt/chatgpt.module';
 
 @Module({
   imports: [
@@ -61,7 +62,8 @@ import { CalendarEventModule } from './calendar-event/calendar-event.module';
     SocketModule,
     ConversationModule,
     MessageModule,
-    CalendarEventModule
+    CalendarEventModule,
+    ChatgptModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskService, MailService, UsersService],

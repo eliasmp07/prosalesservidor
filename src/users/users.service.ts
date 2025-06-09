@@ -20,6 +20,55 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
+  //This function find all users of branches
+  async findAllUsersBranches() {
+    const users = await this.usersRepository.find({
+      where: [
+        { email: Like('%@optivosa.com') },
+        { email: Like('%@propapel.com.mx') },
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+
+    return { users };
+  }
+
+  async findAllUsesByBranch(sucursalId: number) {
+    const users = await this.usersRepository.find({
+      where: [
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('1') },
+          email: Like('%@propapel.com.mx'),
+        },
+        {
+          sucursales: { id: sucursalId },
+          roles: { id: Like('1') },
+          email: Like('%@optivosa.com'),
+        },
+      ],
+      relations: [
+        'sucursales',
+        'roles',
+        'customers',
+        'customers.interactions',
+        'customers.purchases',
+        'customers.reminders',
+        'customers.projects',
+      ],
+    });
+
+    return { users };
+  }
+
   create(user: CreateUserDto) {
     const newUser = this.usersRepository.create(user);
     return this.usersRepository.save(newUser);
