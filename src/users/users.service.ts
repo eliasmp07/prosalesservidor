@@ -46,12 +46,10 @@ export class UsersService {
       where: [
         {
           sucursales: { id: sucursalId },
-          roles: { id: Like('1') },
           email: Like('%@propapel.com.mx'),
         },
         {
           sucursales: { id: sucursalId },
-          roles: { id: Like('1') },
           email: Like('%@optivosa.com'),
         },
       ],

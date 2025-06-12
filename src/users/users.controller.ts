@@ -35,25 +35,20 @@ export class UsersController {
 
   //NEW VERSION GET INFO
   
-  @UseGuards(AccessTokenGuard)
   @Get('findAllUsersBranches')
   findAllUsersBranches() {
     return this.usersService.findAllUsersBranches();
   }
 
-  @UseGuards(AccessTokenGuard)
    @Get('findUsersByBranch/:sucursalId')
   findUsersByBranch(@Param('sucursalId', ParseIntPipe) id: number) {
     return this.usersService.findAllUsesByBranch(id);
   }
 
-  @UseGuards(AccessTokenGuard)
   @Get('findAllUserByBranch/:sucursalId')
   findAllUserBySucursal(@Param('sucursalId', ParseIntPipe) id: number) {
     return this.usersService.findAllUserByBranch(id);
   }
-
-  @UseGuards(AccessTokenGuard)
   @Get('findAllManagerSaleAndRegionalManager/:sucursalId')
   findAllManagerSaleAndRegionalManager(
     @Param('sucursalId', ParseIntPipe) id: number,
@@ -61,13 +56,11 @@ export class UsersController {
     return this.usersService.findAllManagerSaleAndRegionalManager(id);
   }
 
-  @UseGuards(AccessTokenGuard)
   @Get('tableDates')
   findAllDatesUsersByMouth() {
     return this.usersService.findAllDatesNowByAllUsers();
   }
 
-  @UseGuards(AccessTokenGuard)
   @Get('findAppointments')
   async getDatesForMouthAndYear(
     @Query('month') month?: string,

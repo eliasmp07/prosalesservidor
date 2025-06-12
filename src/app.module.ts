@@ -28,6 +28,7 @@ import { MessageModule } from './message/message.module';
 import { UsersService } from './users/users.service';
 import { CalendarEventModule } from './calendar-event/calendar-event.module';
 import { ChatgptModule } from './chatgpt/chatgpt.module';
+import { TicketModule } from './ticket/ticket.module';
 
 @Module({
   imports: [
@@ -63,7 +64,8 @@ import { ChatgptModule } from './chatgpt/chatgpt.module';
     ConversationModule,
     MessageModule,
     CalendarEventModule,
-    ChatgptModule
+    ChatgptModule,
+    TicketModule
   ],
   controllers: [AppController],
   providers: [AppService, TaskService, MailService, UsersService],
